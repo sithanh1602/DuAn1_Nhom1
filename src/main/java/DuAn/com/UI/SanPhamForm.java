@@ -5,13 +5,18 @@
 package DuAn.com.UI;
 
 import java.awt.Cursor;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author NITRO 5
  */
 public class SanPhamForm extends javax.swing.JFrame {
-
+    DefaultTableModel model = new DefaultTableModel();
+    Connection ketNoi;
     /**
      * Creates new form SanPhamForm
      */
@@ -29,6 +34,26 @@ public class SanPhamForm extends javax.swing.JFrame {
         lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
     }
+    
+    public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
+        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_QLBACHHOA;encrypt=true;trustServerCertificate=true";// them doan cuoi vao url
+        String user = "sa";
+        String pass = "123456";
+        ketNoi = DriverManager.getConnection(url, user, pass);
+    }
+    
+     public void datTenCotBang() {
+        //model.setColumnCount(0);
+        model.addColumn("Mã chuyên đ");
+        model.addColumn("Tên chuyên đề");
+        model.addColumn("Học phí");
+        model.addColumn("Thời lượng");
+        model.addColumn("Images");
+        model.addColumn("Mô tả");
+        tblSp.setModel(model);
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -71,7 +96,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         lblThoat = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblSp = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -299,7 +324,7 @@ public class SanPhamForm extends javax.swing.JFrame {
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblSp.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -310,7 +335,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblSp);
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -450,12 +475,12 @@ public class SanPhamForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblBlue;
     private javax.swing.JLabel lblGreen;
     private javax.swing.JLabel lblOr;
     private javax.swing.JLabel lblPic;
     private javax.swing.JLabel lblThoat;
+    private javax.swing.JTable tblSp;
     private javax.swing.JTextField txtGiaTien;
     private javax.swing.JTextField txtSoLuong;
     private javax.swing.JTextField txtTenSP;
