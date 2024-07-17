@@ -318,7 +318,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/images/Price Tag USD.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="&#x110;&#x1a1;n h&#xe0;ng"/>
+                <Property name="text" type="java.lang.String" value="Ho&#xe1; &#x111;&#x1a1;n"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
@@ -341,7 +341,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/images/More Details.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="&#x110;&#x1a1;n h&#xe0;ng chi ti&#x1ebf;t"/>
+                <Property name="text" type="java.lang.String" value="Ho&#xe1; &#x111;&#x1a1;n chi ti&#x1ebf;t"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>

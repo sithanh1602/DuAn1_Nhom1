@@ -24,7 +24,7 @@ public class HomeFrame extends javax.swing.JFrame {
     ImageIcon icon;
     /**
      * Creates new form FormEduSys
-     */
+     */ 
     public HomeFrame() {
         initComponents();
         init();
@@ -214,7 +214,7 @@ public class HomeFrame extends javax.swing.JFrame {
         btnNcc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         btnDonHang.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Price Tag USD.png"))); // NOI18N
-        btnDonHang.setText("Đơn hàng");
+        btnDonHang.setText("Hoá đơn");
         btnDonHang.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDonHang.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDonHang.addActionListener(new java.awt.event.ActionListener() {
@@ -229,7 +229,7 @@ public class HomeFrame extends javax.swing.JFrame {
         btnLoaiSP.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         btnDHCT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/More Details.png"))); // NOI18N
-        btnDHCT.setText("Đơn hàng chi tiết");
+        btnDHCT.setText("Hoá đơn chi tiết");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDHCT.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
@@ -354,25 +354,13 @@ public class HomeFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDangXuatActionPerformed
 
     private void btnKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKhachHangActionPerformed
-//        dispose();
-//        try {
-//            new FormNH().setVisible(true);
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        dispose();
+        new KhachHangForm().setVisible(true);
     }//GEN-LAST:event_btnKhachHangActionPerformed
 
     private void btnSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSanPhamActionPerformed
-//        dispose();
-//        try {
-//            new FormCD().setVisible(true);
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        dispose();
+        new SanPhamForm().setVisible(true);
     }//GEN-LAST:event_btnSanPhamActionPerformed
 
     private void btnNhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNhanVienActionPerformed

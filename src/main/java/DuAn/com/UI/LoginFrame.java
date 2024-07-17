@@ -11,7 +11,7 @@ import java.awt.Cursor;
 
 /**
  *
- * âbc^%
+ *
  */
 public class LoginFrame extends javax.swing.JFrame {
 
