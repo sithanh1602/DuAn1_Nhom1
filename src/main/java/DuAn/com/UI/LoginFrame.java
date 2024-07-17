@@ -11,7 +11,7 @@ import java.awt.Cursor;
 
 /**
  *
- * @author NITRO 5
+ * âbc^%
  */
 public class LoginFrame extends javax.swing.JFrame {
 
