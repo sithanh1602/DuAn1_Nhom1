@@ -19,11 +19,9 @@ public class FormHDCT extends javax.swing.JFrame {
         initComponents();
         init();
     }
-    
-ThanhBranch
-    public void init(){
 
-     public void init(){master
+
+     public void init(){
         setLocationRelativeTo(null);
         lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
@@ -31,11 +29,8 @@ ThanhBranch
         });
         lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
- ThanhBranch
         lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
-
- master
     }
 
     /**
