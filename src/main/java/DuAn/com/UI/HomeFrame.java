@@ -209,6 +209,11 @@ public class HomeFrame extends javax.swing.JFrame {
         btnNcc.setText("Nhà cung cấp");
         btnNcc.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnNcc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnNcc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNccActionPerformed(evt);
+            }
+        });
 
         btnDonHang.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Price Tag USD.png"))); // NOI18N
         btnDonHang.setText("Hoá đơn");
@@ -224,6 +229,11 @@ public class HomeFrame extends javax.swing.JFrame {
         btnDHCT.setText("Hoá đơn chi tiết");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDHCT.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDHCT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDHCTActionPerformed(evt);
+            }
+        });
 
         btnNhanVien.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Staff.png"))); // NOI18N
         btnNhanVien.setText("Nhân viên");
@@ -239,6 +249,11 @@ public class HomeFrame extends javax.swing.JFrame {
         btnThongKe.setText("Thống kê");
         btnThongKe.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnThongKe.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnThongKe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThongKeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -339,7 +354,7 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnDangXuatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDangXuatActionPerformed
         dispose();
-        //new FormLogin().setVisible(true);
+        new LoginFrame().setVisible(true);
     }//GEN-LAST:event_btnDangXuatActionPerformed
 
     private void btnKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKhachHangActionPerformed
@@ -353,19 +368,13 @@ public class HomeFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSanPhamActionPerformed
 
     private void btnNhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNhanVienActionPerformed
-//        dispose();
-//        new FormHV().setVisible(true);
+        dispose();
+        new NhanVienForm().setVisible(true);
     }//GEN-LAST:event_btnNhanVienActionPerformed
 
     private void btnDonHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDonHangActionPerformed
-//        dispose();
-//        try {
-//            new FormKHQL().setVisible(true);
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        dispose();
+        new HoaDonFrame().setVisible(true);
     }//GEN-LAST:event_btnDonHangActionPerformed
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
@@ -383,6 +392,21 @@ public class HomeFrame extends javax.swing.JFrame {
     private void lblOrMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOrMouseClicked
         System.exit(0);
     }//GEN-LAST:event_lblOrMouseClicked
+
+    private void btnNccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNccActionPerformed
+        dispose();
+        new NhaCungCapForm().setVisible(true);
+    }//GEN-LAST:event_btnNccActionPerformed
+
+    private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed
+        dispose();
+        new FormHDCT().setVisible(true);
+    }//GEN-LAST:event_btnDHCTActionPerformed
+
+    private void btnThongKeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThongKeActionPerformed
+        dispose();
+        new ThongKeFrame().setVisible(true);
+    }//GEN-LAST:event_btnThongKeActionPerformed
 
     /**
      * @param args the command line arguments
