@@ -18,7 +18,7 @@ import javax.swing.Timer;
 
 /**
  *
- * @author NITRO 5
+ * @author NITRO 5aaaaaaa
  */
 public class HomeFrame extends javax.swing.JFrame {
     ImageIcon icon;
