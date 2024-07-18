@@ -4,6 +4,8 @@
  */
 package DuAn.com.UI;
 
+import java.awt.Cursor;
+
 /**
  *
  * @author NITRO 5
@@ -15,6 +17,17 @@ public class FormHDCT extends javax.swing.JFrame {
      */
     public FormHDCT() {
         initComponents();
+        init();
+    }
+    
+     public void init(){
+        setLocationRelativeTo(null);
+        lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        lblBlue.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
     }
 
     /**
