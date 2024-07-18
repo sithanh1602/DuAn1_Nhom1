@@ -140,6 +140,7 @@ public class HomeFrame extends javax.swing.JFrame {
         jToolBar2.setRollover(true);
 
         btnDangXuat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/out.png"))); // NOI18N
+        btnDangXuat.setText("Đăng xuất");
         btnDangXuat.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDangXuat.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDangXuat.addActionListener(new java.awt.event.ActionListener() {
@@ -150,12 +151,24 @@ public class HomeFrame extends javax.swing.JFrame {
         jToolBar2.add(btnDangXuat);
 
         btnDoiMatKhau.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Change.png"))); // NOI18N
+        btnDoiMatKhau.setText("Đổi mật khẩu");
         btnDoiMatKhau.setFocusable(false);
         btnDoiMatKhau.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDoiMatKhau.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDoiMatKhau.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnDoiMatKhauMouseClicked(evt);
+            }
+        });
+        btnDoiMatKhau.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDoiMatKhauActionPerformed(evt);
+            }
+        });
         jToolBar2.add(btnDoiMatKhau);
 
         btnHuongDan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Earth Planet.png"))); // NOI18N
+        btnHuongDan.setText("Hướng dẫn");
         btnHuongDan.setFocusable(false);
         btnHuongDan.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnHuongDan.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -331,7 +344,7 @@ public class HomeFrame extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 341, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 321, Short.MAX_VALUE)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -407,6 +420,15 @@ public class HomeFrame extends javax.swing.JFrame {
         dispose();
         new ThongKeFrame().setVisible(true);
     }//GEN-LAST:event_btnThongKeActionPerformed
+
+    private void btnDoiMatKhauMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDoiMatKhauMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDoiMatKhauMouseClicked
+
+    private void btnDoiMatKhauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoiMatKhauActionPerformed
+        dispose();
+        new DoiMatKhauFrame().setVisible(true);
+    }//GEN-LAST:event_btnDoiMatKhauActionPerformed
 
     /**
      * @param args the command line arguments
