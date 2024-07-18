@@ -18,7 +18,7 @@ import javax.swing.Timer;
 
 /**
  *
- * @author NITRO 5
+ * @author NITRO 5aaaaaaa
  */
 public class HomeFrame extends javax.swing.JFrame {
     ImageIcon icon;
@@ -140,6 +140,7 @@ public class HomeFrame extends javax.swing.JFrame {
         jToolBar2.setRollover(true);
 
         btnDangXuat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/out.png"))); // NOI18N
+        btnDangXuat.setText("Đăng xuất");
         btnDangXuat.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDangXuat.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDangXuat.addActionListener(new java.awt.event.ActionListener() {
@@ -150,12 +151,24 @@ public class HomeFrame extends javax.swing.JFrame {
         jToolBar2.add(btnDangXuat);
 
         btnDoiMatKhau.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Change.png"))); // NOI18N
+        btnDoiMatKhau.setText("Đổi mật khẩu");
         btnDoiMatKhau.setFocusable(false);
         btnDoiMatKhau.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDoiMatKhau.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDoiMatKhau.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnDoiMatKhauMouseClicked(evt);
+            }
+        });
+        btnDoiMatKhau.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDoiMatKhauActionPerformed(evt);
+            }
+        });
         jToolBar2.add(btnDoiMatKhau);
 
         btnHuongDan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Earth Planet.png"))); // NOI18N
+        btnHuongDan.setText("Hướng dẫn");
         btnHuongDan.setFocusable(false);
         btnHuongDan.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnHuongDan.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -209,6 +222,11 @@ public class HomeFrame extends javax.swing.JFrame {
         btnNcc.setText("Nhà cung cấp");
         btnNcc.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnNcc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnNcc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNccActionPerformed(evt);
+            }
+        });
 
         btnDonHang.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Price Tag USD.png"))); // NOI18N
         btnDonHang.setText("Hoá đơn");
@@ -224,6 +242,11 @@ public class HomeFrame extends javax.swing.JFrame {
         btnDHCT.setText("Hoá đơn chi tiết");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDHCT.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDHCT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDHCTActionPerformed(evt);
+            }
+        });
 
         btnNhanVien.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Staff.png"))); // NOI18N
         btnNhanVien.setText("Nhân viên");
@@ -239,6 +262,11 @@ public class HomeFrame extends javax.swing.JFrame {
         btnThongKe.setText("Thống kê");
         btnThongKe.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnThongKe.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnThongKe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThongKeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -316,7 +344,7 @@ public class HomeFrame extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 336, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 321, Short.MAX_VALUE)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -339,7 +367,7 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnDangXuatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDangXuatActionPerformed
         dispose();
-        //new FormLogin().setVisible(true);
+        new LoginFrame().setVisible(true);
     }//GEN-LAST:event_btnDangXuatActionPerformed
 
     private void btnKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKhachHangActionPerformed
@@ -353,19 +381,13 @@ public class HomeFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSanPhamActionPerformed
 
     private void btnNhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNhanVienActionPerformed
-//        dispose();
-//        new FormHV().setVisible(true);
+        dispose();
+        new NhanVienForm().setVisible(true);
     }//GEN-LAST:event_btnNhanVienActionPerformed
 
     private void btnDonHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDonHangActionPerformed
-//        dispose();
-//        try {
-//            new FormKHQL().setVisible(true);
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        dispose();
+        new HoaDonFrame().setVisible(true);
     }//GEN-LAST:event_btnDonHangActionPerformed
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
@@ -383,6 +405,30 @@ public class HomeFrame extends javax.swing.JFrame {
     private void lblOrMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOrMouseClicked
         System.exit(0);
     }//GEN-LAST:event_lblOrMouseClicked
+
+    private void btnNccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNccActionPerformed
+        dispose();
+        new NhaCungCapForm().setVisible(true);
+    }//GEN-LAST:event_btnNccActionPerformed
+
+    private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed
+        dispose();
+        new FormHDCT().setVisible(true);
+    }//GEN-LAST:event_btnDHCTActionPerformed
+
+    private void btnThongKeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThongKeActionPerformed
+        dispose();
+        new ThongKeFrame().setVisible(true);
+    }//GEN-LAST:event_btnThongKeActionPerformed
+
+    private void btnDoiMatKhauMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDoiMatKhauMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDoiMatKhauMouseClicked
+
+    private void btnDoiMatKhauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoiMatKhauActionPerformed
+        dispose();
+        new DoiMatKhauFrame().setVisible(true);
+    }//GEN-LAST:event_btnDoiMatKhauActionPerformed
 
     /**
      * @param args the command line arguments

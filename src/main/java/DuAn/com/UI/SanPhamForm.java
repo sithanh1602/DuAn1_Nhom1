@@ -33,6 +33,8 @@ public class SanPhamForm extends javax.swing.JFrame {
         });
         lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
+        lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
     }
     
     public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
