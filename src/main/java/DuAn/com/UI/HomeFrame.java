@@ -50,8 +50,6 @@ public class HomeFrame extends javax.swing.JFrame {
         });
         btnKhachHang.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
-        btnLoaiSP.setCursor(new Cursor(Cursor.HAND_CURSOR) {
-        });
         btnNcc.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
         btnNhanVien.setCursor(new Cursor(Cursor.HAND_CURSOR) {
@@ -101,7 +99,6 @@ public class HomeFrame extends javax.swing.JFrame {
         btnKhachHang = new javax.swing.JButton();
         btnNcc = new javax.swing.JButton();
         btnDonHang = new javax.swing.JButton();
-        btnLoaiSP = new javax.swing.JButton();
         btnDHCT = new javax.swing.JButton();
         btnNhanVien = new javax.swing.JButton();
         btnThongKe = new javax.swing.JButton();
@@ -223,11 +220,6 @@ public class HomeFrame extends javax.swing.JFrame {
             }
         });
 
-        btnLoaiSP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/products.png"))); // NOI18N
-        btnLoaiSP.setText("Loại sản phẩm");
-        btnLoaiSP.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnLoaiSP.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-
         btnDHCT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/More Details.png"))); // NOI18N
         btnDHCT.setText("Hoá đơn chi tiết");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -262,8 +254,6 @@ public class HomeFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDonHang)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnLoaiSP)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDHCT)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnNhanVien)
@@ -285,7 +275,6 @@ public class HomeFrame extends javax.swing.JFrame {
                     .addComponent(btnThongKe, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnNhanVien, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDHCT, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnLoaiSP, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDonHang, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnNcc, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnKhachHang, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -436,7 +425,6 @@ public class HomeFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnDonHang;
     private javax.swing.JButton btnHuongDan;
     private javax.swing.JButton btnKhachHang;
-    private javax.swing.JButton btnLoaiSP;
     private javax.swing.JButton btnNcc;
     private javax.swing.JButton btnNhanVien;
     private javax.swing.JButton btnSanPham;
