@@ -21,6 +21,12 @@ public class FormHDCT extends javax.swing.JFrame {
     }
 
 
+
+    
+
+  
+
+
      public void init(){
         setLocationRelativeTo(null);
         lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {
@@ -29,9 +35,19 @@ public class FormHDCT extends javax.swing.JFrame {
         });
         lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
+
         lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
     }
+
+
+        lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+     }
+
+
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
