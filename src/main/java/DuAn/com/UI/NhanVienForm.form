@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <NonVisualComponents>
+    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="undecorated" type="boolean" value="true"/>
@@ -348,9 +352,9 @@
                                   <Component id="txtChucVu" max="32767" attributes="0"/>
                                   <Component id="jLabel4" alignment="0" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
-                                      <Component id="jRadioButton1" min="-2" pref="132" max="-2" attributes="0"/>
+                                      <Component id="rdoMale" min="-2" pref="132" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jRadioButton2" min="-2" pref="98" max="-2" attributes="0"/>
+                                      <Component id="rdoFemale" min="-2" pref="98" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="14" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="jLabel5" alignment="0" max="32767" attributes="0"/>
@@ -378,8 +382,8 @@
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jRadioButton2" pref="44" max="32767" attributes="0"/>
-                                  <Component id="jRadioButton1" max="32767" attributes="0"/>
+                                  <Component id="rdoFemale" pref="44" max="32767" attributes="0"/>
+                                  <Component id="rdoMale" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -419,16 +423,22 @@
                         <Property name="text" type="java.lang.String" value="Gi&#x1edb;i t&#xed;nh:"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JRadioButton" name="jRadioButton1">
+                    <Component class="javax.swing.JRadioButton" name="rdoMale">
                       <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="buttonGroup1"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="Nam"/>
                       </Properties>
                       <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton1ActionPerformed"/>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdoMaleActionPerformed"/>
                       </Events>
                     </Component>
-                    <Component class="javax.swing.JRadioButton" name="jRadioButton2">
+                    <Component class="javax.swing.JRadioButton" name="rdoFemale">
                       <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="buttonGroup1"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="N&#x1eef;"/>
                       </Properties>
                     </Component>
@@ -444,7 +454,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="txtLuong" max="32767" attributes="0"/>
                                   <Component id="jLabel6" max="32767" attributes="0"/>
-                                  <Component id="txtPassword" max="32767" attributes="0"/>
+                                  <Component id="txtMK_NV" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -464,7 +474,7 @@
                               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtPassword" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtMK_NV" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                               <Component id="jPanel3" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -488,7 +498,7 @@
                         <Property name="text" type="java.lang.String" value="M&#x1ead;t kh&#x1ea9;u:"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="txtPassword">
+                    <Component class="javax.swing.JTextField" name="txtMK_NV">
                       <Properties>
                         <Property name="toolTipText" type="java.lang.String" value=""/>
                       </Properties>
