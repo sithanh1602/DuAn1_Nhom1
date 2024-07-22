@@ -4,6 +4,7 @@
  */
 package DuAn.com.UI;
 
+import CheckForm.ResetForm;
 import java.awt.Cursor;
 
 /**
@@ -15,15 +16,13 @@ public class FormHDCT extends javax.swing.JFrame {
     /**
      * Creates new form FormHDCT
      */
-    public FormHDCT() {
+     public FormHDCT() {
         initComponents();
         init();
+       
     }
-    
 
-  
-
-     public void init(){
+    public void init() {
         setLocationRelativeTo(null);
         lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
@@ -34,10 +33,7 @@ public class FormHDCT extends javax.swing.JFrame {
 
         lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
-     }
-
-
-
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -70,7 +66,7 @@ public class FormHDCT extends javax.swing.JFrame {
         btnThem = new javax.swing.JButton();
         btnSua = new javax.swing.JButton();
         btnXoa = new javax.swing.JButton();
-        btnMoi = new javax.swing.JButton();
+        btnReset = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -127,8 +123,13 @@ public class FormHDCT extends javax.swing.JFrame {
         btnXoa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/remove.png"))); // NOI18N
         btnXoa.setText("Xoá");
 
-        btnMoi.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/reset.png"))); // NOI18N
-        btnMoi.setText("Mới");
+        btnReset.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/reset.png"))); // NOI18N
+        btnReset.setText("Mới");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -174,7 +175,7 @@ public class FormHDCT extends javax.swing.JFrame {
                         .addGap(26, 26, 26)
                         .addComponent(btnXoa)
                         .addGap(22, 22, 22)
-                        .addComponent(btnMoi)
+                        .addComponent(btnReset)
                         .addContainerGap())))
         );
         jPanel2Layout.setVerticalGroup(
@@ -209,8 +210,8 @@ public class FormHDCT extends javax.swing.JFrame {
                     .addComponent(btnThem)
                     .addComponent(btnSua)
                     .addComponent(btnXoa)
-                    .addComponent(btnMoi, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                    .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblThoat, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton11, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -244,6 +245,7 @@ public class FormHDCT extends javax.swing.JFrame {
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Bill.png"))); // NOI18N
         jLabel1.setText("Hoá đơn chi tiết");
 
@@ -330,9 +332,9 @@ public class FormHDCT extends javax.swing.JFrame {
     }//GEN-LAST:event_lblOrMouseClicked
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
-        if(this.getExtendedState() != LoginFrame.MAXIMIZED_BOTH){
+        if (this.getExtendedState() != LoginFrame.MAXIMIZED_BOTH) {
             this.setExtendedState(LoginFrame.MAXIMIZED_BOTH);
-        }else{
+        } else {
             this.setExtendedState(LoginFrame.NORMAL);
         }
     }//GEN-LAST:event_lblBlueMouseClicked
@@ -342,9 +344,13 @@ public class FormHDCT extends javax.swing.JFrame {
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
-       dispose();
-       new HomeFrame().setVisible(true);
+        dispose();
+        new HomeFrame().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
+
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+     ResetForm resetForm = new ResetForm();
+    }//GEN-LAST:event_btnResetActionPerformed
 
     /**
      * @param args the command line arguments
@@ -382,7 +388,7 @@ public class FormHDCT extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnMoi;
+    private javax.swing.JButton btnReset;
     private javax.swing.JButton btnSua;
     private javax.swing.JButton btnThem;
     private javax.swing.JButton btnXoa;

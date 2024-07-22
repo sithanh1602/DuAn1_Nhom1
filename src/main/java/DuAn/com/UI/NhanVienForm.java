@@ -6,13 +6,18 @@ package DuAn.com.UI;
 
 import CheckForm.AddID_Auto;
 import CheckForm.AddMK_Auto;
+import CheckForm.Hide_Password;
 import java.awt.Cursor;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.JTextField;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -21,13 +26,8 @@ import javax.swing.table.DefaultTableModel;
  */
 public class NhanVienForm extends javax.swing.JFrame {
 
-    DefaultTableModel model = new DefaultTableModel();
-    Connection ketNoi;
-    private Map<String, JTextField> textFieldMap = new HashMap<>();
+    String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
-    /**
-     * Creates new form SanPhamForm
-     */
     public NhanVienForm() {
         initComponents();
         init();
@@ -37,7 +37,71 @@ public class NhanVienForm extends javax.swing.JFrame {
         AddMK_Auto addMK_Auto = new AddMK_Auto();
         addMK_Auto.initTextFieldMap(this);
         addMK_Auto.setTextFieldValues();
-                
+        loadTable_Staff();
+        tblStaff.getColumnModel().getColumn(6).setCellRenderer(new Hide_Password());
+
+        tblStaff.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // Kiểm tra xem có hàng nào được chọn không
+                if (!e.getValueIsAdjusting() && tblStaff.getSelectedRow() != -1) {
+                    // Lấy chỉ số hàng được chọn
+                    int row = tblStaff.getSelectedRow();
+
+                    // Lấy dữ liệu từ hàng được chọn
+                    String id = tblStaff.getValueAt(row, 0).toString();
+                    String name = tblStaff.getValueAt(row, 1).toString();
+                    String gender = tblStaff.getValueAt(row, 2).toString();
+                    String date = tblStaff.getValueAt(row, 3).toString();
+                    String role = tblStaff.getValueAt(row, 4).toString();
+                    String salary = tblStaff.getValueAt(row, 5).toString();
+                    String password = tblStaff.getValueAt(row, 6).toString();
+
+                    // Cập nhật các ô nhập liệu
+                    txtID_NV.setText(id);
+                    txtNameNV.setText(name);
+                    if (gender.equals("Nam")) {
+                        rdoMale.setSelected(true);
+                    } else {
+                        rdoFemale.setSelected(true);
+                    }
+                    txtDate.setText(date);
+                    txtChucVu.setText(role);
+                    txtLuong.setText(salary);
+
+                    // Cập nhật ô mật khẩu với dấu sao
+                    String maskedPassword = "*".repeat(password.length());
+                    txtMK_NV.setText(maskedPassword);
+                }
+            }
+        });
+    }
+
+    private void loadTable_Staff() {
+        DefaultTableModel model = (DefaultTableModel) tblStaff.getModel();
+        model.setRowCount(0); // Clear all rows in the table before filling it with new data
+        String query = "SELECT * FROM NHAN_VIEN";
+        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+            try ( ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String ID = rs.getString("ID_NV");
+                    String name = rs.getString("TEN_NV");
+                    String Gender = rs.getString("GIOI_TINH");
+                    String Date = rs.getString("NGAY_VAO_LAM");
+                    String Role = rs.getString("CHUC_VU");
+                    String Salary = rs.getString("LUONG");
+                    String password = rs.getString("MAT_KHAU");
+
+                    // Add a new row to the table with the course information
+                    model.addRow(new Object[]{ID, name, Gender, Date, Role, Salary, password});
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị người học thống kê: " + ex.getMessage());
+        }
+
+        // Apply the password renderer to the password column (assuming it's column 6)
+        tblStaff.getColumnModel().getColumn(6).setCellRenderer(new Hide_Password());
     }
 
     public void init() {
@@ -50,24 +114,6 @@ public class NhanVienForm extends javax.swing.JFrame {
         });
         lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
-    }
-
-    public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
-        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_QLBACHHOA;encrypt=true;trustServerCertificate=true";// them doan cuoi vao url
-        String user = "sa";
-        String pass = "123456";
-        ketNoi = DriverManager.getConnection(url, user, pass);
-    }
-
-    public void datTenCotBang() {
-        //model.setColumnCount(0);
-        model.addColumn("Mã chuyên đ");
-        model.addColumn("Tên chuyên đề");
-        model.addColumn("Học phí");
-        model.addColumn("Thời lượng");
-        model.addColumn("Images");
-        model.addColumn("Mô tả");
-        tblSp.setModel(model);
     }
 
     /**
@@ -87,9 +133,9 @@ public class NhanVienForm extends javax.swing.JFrame {
         lblOr = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        btnThem = new javax.swing.JButton();
-        btnSua = new javax.swing.JButton();
-        btnXoa = new javax.swing.JButton();
+        btnAdd_NV = new javax.swing.JButton();
+        btnUpdate_NV = new javax.swing.JButton();
+        btnDelete_NV = new javax.swing.JButton();
         btnMoi = new javax.swing.JButton();
         btn4 = new javax.swing.JButton();
         btn3 = new javax.swing.JButton();
@@ -112,10 +158,11 @@ public class NhanVienForm extends javax.swing.JFrame {
         txtLuong = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         txtMK_NV = new javax.swing.JTextField();
-        jPanel3 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        txtDate = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblSp = new javax.swing.JTable();
+        tblStaff = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -144,22 +191,37 @@ public class NhanVienForm extends javax.swing.JFrame {
             }
         });
 
-        btnThem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Add.png"))); // NOI18N
-        btnThem.setText("Thêm");
-        btnThem.addActionListener(new java.awt.event.ActionListener() {
+        btnAdd_NV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Add.png"))); // NOI18N
+        btnAdd_NV.setText("Thêm");
+        btnAdd_NV.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnThemActionPerformed(evt);
+                btnAdd_NVActionPerformed(evt);
             }
         });
 
-        btnSua.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/fix.png"))); // NOI18N
-        btnSua.setText("Sửa");
+        btnUpdate_NV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/fix.png"))); // NOI18N
+        btnUpdate_NV.setText("Sửa");
+        btnUpdate_NV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdate_NVActionPerformed(evt);
+            }
+        });
 
-        btnXoa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/remove.png"))); // NOI18N
-        btnXoa.setText("Xoá");
+        btnDelete_NV.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/remove.png"))); // NOI18N
+        btnDelete_NV.setText("Xoá");
+        btnDelete_NV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelete_NVActionPerformed(evt);
+            }
+        });
 
         btnMoi.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/reset.png"))); // NOI18N
         btnMoi.setText("Mới");
+        btnMoi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMoiActionPerformed(evt);
+            }
+        });
 
         btn4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/last.png"))); // NOI18N
 
@@ -190,7 +252,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel6Layout.createSequentialGroup()
                         .addGap(27, 27, 27)
-                        .addComponent(btnThem))
+                        .addComponent(btnAdd_NV))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel6Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(lblThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -205,9 +267,9 @@ public class NhanVienForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btn4))
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(btnSua)
+                        .addComponent(btnUpdate_NV)
                         .addGap(35, 35, 35)
-                        .addComponent(btnXoa)
+                        .addComponent(btnDelete_NV)
                         .addGap(36, 36, 36)
                         .addComponent(btnMoi)
                         .addGap(0, 57, Short.MAX_VALUE)))
@@ -218,9 +280,9 @@ public class NhanVienForm extends javax.swing.JFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnThem)
-                    .addComponent(btnSua)
-                    .addComponent(btnXoa)
+                    .addComponent(btnAdd_NV)
+                    .addComponent(btnUpdate_NV)
+                    .addComponent(btnDelete_NV)
                     .addComponent(btnMoi, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -310,16 +372,13 @@ public class NhanVienForm extends javax.swing.JFrame {
 
         txtMK_NV.setToolTipText("");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 268, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 145, Short.MAX_VALUE)
-        );
+        jLabel8.setText("Ngày vào làm:");
+
+        txtDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDateActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -328,13 +387,14 @@ public class NhanVienForm extends javax.swing.JFrame {
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtLuong)
+                    .addComponent(txtDate)
+                    .addComponent(txtLuong, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtMK_NV)
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel9Layout.setVerticalGroup(
@@ -347,9 +407,11 @@ public class NhanVienForm extends javax.swing.JFrame {
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtMK_NV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(36, 36, 36)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -396,18 +458,15 @@ public class NhanVienForm extends javax.swing.JFrame {
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        tblSp.setModel(new javax.swing.table.DefaultTableModel(
+        tblStaff.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "MÃ NHÂN VIÊN", "TÊN NHÂN VIÊN", "GIỚI TÍNH", "NGÀY VÀO LÀM", "CHỨC VỤ", "LƯƠNG", "MẬT KHẨU"
             }
         ));
-        jScrollPane1.setViewportView(tblSp);
+        jScrollPane1.setViewportView(tblStaff);
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -491,14 +550,187 @@ public class NhanVienForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_rdoMaleActionPerformed
 
-    private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnThemActionPerformed
+    private boolean validateForm() {
+        if (txtID_NV.getText().trim().isEmpty() || txtNameNV.getText().trim().isEmpty()
+                || txtChucVu.getText().trim().isEmpty() || txtLuong.getText().trim().isEmpty()
+                || txtMK_NV.getText().trim().isEmpty() || txtDate.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        try {
+            Double salary = Double.parseDouble(txtLuong.getText().trim());
+            if (salary < 1000000) {
+                JOptionPane.showMessageDialog(this, "Lương phải lớn hơn 1 triệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Lương phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            sdf.setLenient(false);
+            sdf.parse(txtDate.getText().trim());
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Ngày vào làm không hợp lệ. Định dạng đúng là yyyy-MM-dd.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void btnAdd_NVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdd_NVActionPerformed
+        if (validateForm()) {
+            String ID = txtID_NV.getText().trim();
+            String name = txtNameNV.getText().trim();
+            String Gender = rdoMale.isSelected() ? "Nam" : "Nữ";
+            String Date = txtDate.getText().trim();
+            String Role = txtChucVu.getText().trim();
+            double Salary = Double.parseDouble(txtLuong.getText().trim());
+            String password = txtMK_NV.getText().trim();
+
+            String query = "INSERT INTO NHAN_VIEN (ID_NV, TEN_NV, GIOI_TINH, NGAY_VAO_LAM, CHUC_VU, LUONG, MAT_KHAU) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+                pst.setString(1, ID);
+                pst.setString(2, name);
+                pst.setString(3, Gender);
+                pst.setString(4, Date);
+                pst.setString(5, Role);
+                pst.setDouble(6, Salary);
+                pst.setString(7, password);
+
+                int result = pst.executeUpdate();
+                if (result > 0) {
+                    JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công.");
+                    loadTable_Staff();
+                    // Làm sạch các ô nhập liệu sau khi thêm thành công
+                    txtID_NV.setText("");
+                    txtNameNV.setText("");
+                    rdoMale.setSelected(false);
+                    rdoFemale.setSelected(false);
+                    txtDate.setText("");
+                    txtChucVu.setText("");
+                    txtLuong.setText("");
+                    txtMK_NV.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Thêm nhân viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi thêm nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnAdd_NVActionPerformed
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
         new HomeFrame().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
+
+    private void txtDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDateActionPerformed
+
+    private void btnUpdate_NVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdate_NVActionPerformed
+        // Kiểm tra tính hợp lệ của dữ liệu
+        if (validateForm()) {
+            String ID = txtID_NV.getText().trim();
+            String name = txtNameNV.getText().trim();
+            String Gender = rdoMale.isSelected() ? "Nam" : "Nữ";
+            String Date = txtDate.getText().trim();
+            String Role = txtChucVu.getText().trim();
+            double Salary = Double.parseDouble(txtLuong.getText().trim());
+            String password = txtMK_NV.getText().trim();
+
+            // Câu lệnh SQL cập nhật thông tin nhân viên
+            String query = "UPDATE NHAN_VIEN SET TEN_NV = ?, GIOI_TINH = ?, NGAY_VAO_LAM = ?, CHUC_VU = ?, LUONG = ?, MAT_KHAU = ? WHERE ID_NV = ?";
+
+            try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+                // Thiết lập các tham số cho câu lệnh SQL
+                pst.setString(1, name);
+                pst.setString(2, Gender);
+                pst.setString(3, Date);
+                pst.setString(4, Role);
+                pst.setDouble(5, Salary);
+                pst.setString(6, password);
+                pst.setString(7, ID);
+
+                // Thực hiện cập nhật
+                int result = pst.executeUpdate();
+                if (result > 0) {
+                    JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công.");
+                    loadTable_Staff();
+                    // Cập nhật bảng dữ liệu sau khi cập nhật thành công
+                    // Làm sạch các ô nhập liệu sau khi thêm thành công
+                    txtID_NV.setText("");
+                    txtNameNV.setText("");
+                    rdoMale.setSelected(false);
+                    rdoFemale.setSelected(false);
+                    txtDate.setText("");
+                    txtChucVu.setText("");
+                    txtLuong.setText("");
+                    txtMK_NV.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }    }//GEN-LAST:event_btnUpdate_NVActionPerformed
+
+    private void btnDelete_NVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelete_NVActionPerformed
+        // Lấy mã chuyên đề từ trường nhập liệu
+        String ID = txtID_NV.getText();
+        // Xác nhận xóa
+        int option = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa nhân viên này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            try {
+                Connection con = DriverManager.getConnection(url);
+
+                // Kiểm tra xem chuyên đề có đang được sử dụng trong bảng KHOA_HOC hoặc HOC_VIEN không
+                String checkQuery = "SELECT * FROM NHAN_VIEN WHERE ID_NV = ?";
+                PreparedStatement checkStatement = con.prepareStatement(checkQuery);
+                checkStatement.setString(1, ID);
+                ResultSet resultSet = checkStatement.executeQuery();
+
+                String sql = "DELETE FROM NHAN_VIEN WHERE ID_NV = ?";
+                PreparedStatement statement = con.prepareStatement(sql);
+                statement.setString(1, ID);
+
+                int rowsDeleted = statement.executeUpdate();
+                if (rowsDeleted > 0) {
+                    JOptionPane.showMessageDialog(null, "Xóa nhân viên thành công.");
+                    loadTable_Staff();
+                    // Làm sạch các ô nhập liệu sau khi thêm thành công
+                    txtID_NV.setText("");
+                    txtNameNV.setText("");
+                    rdoMale.setSelected(false);
+                    rdoFemale.setSelected(false);
+                    txtDate.setText("");
+                    txtChucVu.setText("");
+                    txtLuong.setText("");
+                    txtMK_NV.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Không có nhân viên nào được xóa.");
+
+                }
+                con.close();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Lỗi khi xóa thông tin nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }    }//GEN-LAST:event_btnDelete_NVActionPerformed
+
+    private void btnMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoiActionPerformed
+        txtID_NV.setText("");
+        txtNameNV.setText("");
+        rdoMale.setSelected(false);
+        rdoFemale.setSelected(false);
+        txtDate.setText("");
+        txtChucVu.setText("");
+        txtLuong.setText("");
+        txtMK_NV.setText("");    }//GEN-LAST:event_btnMoiActionPerformed
 
     /**
      * @param args the command line arguments
@@ -543,10 +775,10 @@ public class NhanVienForm extends javax.swing.JFrame {
     private javax.swing.JButton btn2;
     private javax.swing.JButton btn3;
     private javax.swing.JButton btn4;
+    private javax.swing.JButton btnAdd_NV;
+    private javax.swing.JButton btnDelete_NV;
     private javax.swing.JButton btnMoi;
-    private javax.swing.JButton btnSua;
-    private javax.swing.JButton btnThem;
-    private javax.swing.JButton btnXoa;
+    private javax.swing.JButton btnUpdate_NV;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -555,9 +787,9 @@ public class NhanVienForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -570,8 +802,9 @@ public class NhanVienForm extends javax.swing.JFrame {
     private javax.swing.JLabel lblThoat;
     private javax.swing.JRadioButton rdoFemale;
     private javax.swing.JRadioButton rdoMale;
-    private javax.swing.JTable tblSp;
+    private javax.swing.JTable tblStaff;
     private javax.swing.JTextField txtChucVu;
+    private javax.swing.JTextField txtDate;
     private javax.swing.JTextField txtID_NV;
     private javax.swing.JTextField txtLuong;
     private javax.swing.JTextField txtMK_NV;
