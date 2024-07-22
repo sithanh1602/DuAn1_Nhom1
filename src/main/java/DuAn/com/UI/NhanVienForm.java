@@ -7,6 +7,7 @@ package DuAn.com.UI;
 import CheckForm.AddID_Auto;
 import CheckForm.AddMK_Auto;
 import CheckForm.Hide_Password;
+import CheckForm.ResetForm;
 import java.awt.Cursor;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,10 +38,13 @@ public class NhanVienForm extends javax.swing.JFrame {
         AddMK_Auto addMK_Auto = new AddMK_Auto();
         addMK_Auto.initTextFieldMap(this);
         addMK_Auto.setTextFieldValues();
+        ResetForm resetForm = new ResetForm();
+        resetForm.resetComponents();
         loadTable_Staff();
         tblStaff.getColumnModel().getColumn(6).setCellRenderer(new Hide_Password());
 
         tblStaff.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 // Kiểm tra xem có hàng nào được chọn không
@@ -136,7 +140,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         btnAdd_NV = new javax.swing.JButton();
         btnUpdate_NV = new javax.swing.JButton();
         btnDelete_NV = new javax.swing.JButton();
-        btnMoi = new javax.swing.JButton();
+        btnReset = new javax.swing.JButton();
         btn4 = new javax.swing.JButton();
         btn3 = new javax.swing.JButton();
         btn2 = new javax.swing.JButton();
@@ -215,11 +219,11 @@ public class NhanVienForm extends javax.swing.JFrame {
             }
         });
 
-        btnMoi.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/reset.png"))); // NOI18N
-        btnMoi.setText("Mới");
-        btnMoi.addActionListener(new java.awt.event.ActionListener() {
+        btnReset.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/reset.png"))); // NOI18N
+        btnReset.setText("Mới");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMoiActionPerformed(evt);
+                btnResetActionPerformed(evt);
             }
         });
 
@@ -271,7 +275,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                         .addGap(35, 35, 35)
                         .addComponent(btnDelete_NV)
                         .addGap(36, 36, 36)
-                        .addComponent(btnMoi)
+                        .addComponent(btnReset)
                         .addGap(0, 57, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -283,7 +287,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                     .addComponent(btnAdd_NV)
                     .addComponent(btnUpdate_NV)
                     .addComponent(btnDelete_NV)
-                    .addComponent(btnMoi, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -465,8 +469,19 @@ public class NhanVienForm extends javax.swing.JFrame {
             new String [] {
                 "MÃ NHÂN VIÊN", "TÊN NHÂN VIÊN", "GIỚI TÍNH", "NGÀY VÀO LÀM", "CHỨC VỤ", "LƯƠNG", "MẬT KHẨU"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                true, true, true, true, true, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(tblStaff);
+        if (tblStaff.getColumnModel().getColumnCount() > 0) {
+            tblStaff.getColumnModel().getColumn(6).setResizable(false);
+        }
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -560,8 +575,8 @@ public class NhanVienForm extends javax.swing.JFrame {
 
         try {
             Double salary = Double.parseDouble(txtLuong.getText().trim());
-            if (salary < 1000000) {
-                JOptionPane.showMessageDialog(this, "Lương phải lớn hơn 1 triệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            if (salary < 10000000) {
+                JOptionPane.showMessageDialog(this, "Lương phải lớn hơn 10 triệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         } catch (NumberFormatException e) {
@@ -722,7 +737,7 @@ public class NhanVienForm extends javax.swing.JFrame {
             }
         }    }//GEN-LAST:event_btnDelete_NVActionPerformed
 
-    private void btnMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoiActionPerformed
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
         txtID_NV.setText("");
         txtNameNV.setText("");
         rdoMale.setSelected(false);
@@ -730,7 +745,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         txtDate.setText("");
         txtChucVu.setText("");
         txtLuong.setText("");
-        txtMK_NV.setText("");    }//GEN-LAST:event_btnMoiActionPerformed
+        txtMK_NV.setText("");    }//GEN-LAST:event_btnResetActionPerformed
 
     /**
      * @param args the command line arguments
@@ -777,7 +792,7 @@ public class NhanVienForm extends javax.swing.JFrame {
     private javax.swing.JButton btn4;
     private javax.swing.JButton btnAdd_NV;
     private javax.swing.JButton btnDelete_NV;
-    private javax.swing.JButton btnMoi;
+    private javax.swing.JButton btnReset;
     private javax.swing.JButton btnUpdate_NV;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
