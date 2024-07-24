@@ -146,38 +146,37 @@ public class ThongKeFrame extends javax.swing.JFrame {
         }
     }
 
-private void fetchAndDisplayData_DoanhSo() {
-    String minDate = txtMinDate.getText();
-    String maxDate = txtMaxDate.getText();
-    DefaultTableModel model = (DefaultTableModel) tblDoanhSo.getModel();
-    model.setRowCount(0); // Clear existing data
+    private void fetchAndDisplayData_DoanhSo() {
+        String minDate = txtMinDate.getText();
+        String maxDate = txtMaxDate.getText();
+        DefaultTableModel model = (DefaultTableModel) tblDoanhSo.getModel();
+        model.setRowCount(0); // Clear existing data
 
-    try (Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;");
-         PreparedStatement ps = conn.prepareStatement(
-             "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP, SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_TIEN " +
-             "FROM NHAN_VIEN A " +
-             "INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV " +
-             "WHERE NGAYBAN_HANG >= ? AND NGAYBAN_HANG <= ? " +
-             "GROUP BY A.ID_NV, TEN_NV")) {
+        try ( Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;");  PreparedStatement ps = conn.prepareStatement(
+                "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP, SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_TIEN "
+                + "FROM NHAN_VIEN A "
+                + "INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV "
+                + "WHERE NGAYBAN_HANG >= ? AND NGAYBAN_HANG <= ? "
+                + "GROUP BY A.ID_NV, TEN_NV")) {
 
-        ps.setString(1, minDate);
-        ps.setString(2, maxDate);
-        ResultSet rs = ps.executeQuery();
+            ps.setString(1, minDate);
+            ps.setString(2, maxDate);
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            Object[] row = {
-                rs.getString("ID_NV"),
-                rs.getString("TEN_NV"),
-                rs.getInt("TONG_SP"),
-                rs.getInt("TONG_SL_BAN"),
-                rs.getDouble("TONG_TIEN")
-            };
-            model.addRow(row);
+            while (rs.next()) {
+                Object[] row = {
+                    rs.getString("ID_NV"),
+                    rs.getString("TEN_NV"),
+                    rs.getInt("TONG_SP"),
+                    rs.getInt("TONG_SL_BAN"),
+                    rs.getDouble("TONG_TIEN")
+                };
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
         }
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
     }
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -215,6 +214,7 @@ private void fetchAndDisplayData_DoanhSo() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Circle Chart.png"))); // NOI18N
         jLabel1.setText("Thống kê");
 
@@ -260,15 +260,16 @@ private void fetchAndDisplayData_DoanhSo() {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(txtMinDate, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(33, 33, 33)
                         .addComponent(jLabel3)
                         .addGap(37, 37, 37)
                         .addComponent(txtMaxDate, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                        .addComponent(lblThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -279,11 +280,9 @@ private void fetchAndDisplayData_DoanhSo() {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMinDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(txtMaxDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtMaxDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblThoat))
                 .addContainerGap(23, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(lblThoat))
         );
 
         jPanel5.setLayout(new java.awt.BorderLayout());
