@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package DuAn.com.UI;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +12,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 /**
@@ -372,12 +370,24 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKhachHangActionPerformed
         dispose();
-        new KhachHangForm().setVisible(true);
+        try {
+            new KhachHangForm().setVisible(true);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnKhachHangActionPerformed
 
     private void btnSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSanPhamActionPerformed
         dispose();
-        new SanPhamForm().setVisible(true);
+        try {
+            new SanPhamForm().setVisible(true);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnSanPhamActionPerformed
 
     private void btnNhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNhanVienActionPerformed
@@ -408,7 +418,13 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnNccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNccActionPerformed
         dispose();
-        new NhaCungCapForm().setVisible(true);
+        try {
+            new NhaCungCapForm().setVisible(true);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnNccActionPerformed
 
     private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed

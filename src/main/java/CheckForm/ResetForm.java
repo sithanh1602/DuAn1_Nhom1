@@ -55,7 +55,7 @@ public class ResetForm {
         }
     }
 
-    private void resetComponents() {
+     public void resetComponents() {
         textFieldMap.forEach((name, textField) -> textField.setText(""));
         comboBoxMap.forEach((name, comboBox) -> comboBox.setSelectedIndex(0));
         radioButtonMap.forEach((name, radioButton) -> radioButton.setSelected(true));
