@@ -370,7 +370,13 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKhachHangActionPerformed
         dispose();
-        new KhachHangForm().setVisible(true);
+        try {
+            new KhachHangForm().setVisible(true);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnKhachHangActionPerformed
 
     private void btnSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSanPhamActionPerformed
@@ -412,7 +418,13 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnNccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNccActionPerformed
         dispose();
-        new NhaCungCapForm().setVisible(true);
+        try {
+            new NhaCungCapForm().setVisible(true);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnNccActionPerformed
 
     private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed
