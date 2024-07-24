@@ -3,18 +3,26 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package DuAn.com.UI;
-
+import DuAn.com.UI.staff.HomeFrameStaff;
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
  *
  */
-public class LoginFrame extends javax.swing.JFrame {
+public class LoginFrame extends javax.swing.JFrame{
 
+    Connection ketNoi;
     /**
      * Creates new form LoginFrame
      */
@@ -50,7 +58,58 @@ public class LoginFrame extends javax.swing.JFrame {
         }
     }
     
+     public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
+        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY;encrypt=true;trustServerCertificate=true;";// them doan cuoi vao url
+        String user = "sa";
+        String pass = "123456";
+        ketNoi = DriverManager.getConnection(url, user, pass);
+    }
     
+
+    private void checkAccount() throws ClassNotFoundException, SQLException {
+        String username = txtUser.getText();
+        char[] passwordChars = txtPass.getPassword();
+        String password = new String(passwordChars);
+        ketNoiCsdl();
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            String sql = "SELECT CHUC_VU FROM NHAN_VIEN WHERE ID_NV = ? AND MAT_KHAU= ?";
+            try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
+                statement.setString(1, username);
+                statement.setString(2, password);
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    String chucvu = resultSet.getString("CHUC_VU");
+                    if (chucvu.equals("Quản lý")) {
+                        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
+                        this.dispose();
+                        new HomeFrame().setVisible(true);
+                    } else{
+                        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
+                        this.dispose();
+                        new HomeFrameStaff().setVisible(true);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public boolean checkVali() {
+        if (txtUser.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Bạn phải nhập tài khoản !");
+            return false;
+        }
+        if (txtPass.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Bạn phải nhập mật khẩu !");
+            return false;
+        }
+        return true;
+
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -128,6 +187,11 @@ public class LoginFrame extends javax.swing.JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 btnDangNhapMouseExited(evt);
+            }
+        });
+        btnDangNhap.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDangNhapActionPerformed(evt);
             }
         });
         jPanel2.add(btnDangNhap, new org.netbeans.lib.awtextra.AbsoluteConstraints(69, 271, 151, 32));
@@ -216,6 +280,19 @@ public class LoginFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jLabel6MouseClicked
 
+    private void btnDangNhapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDangNhapActionPerformed
+        // TODO add your handling code here:
+        if (checkVali()) {
+            try {
+                checkAccount();
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        };
+    }//GEN-LAST:event_btnDangNhapActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -269,4 +346,5 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtPass;
     private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
+
 }
