@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author NITRO 5 dsd xccxxc
+ * @author NITRO 5 dsd xccxxcsdf
  */
 public class NhanVienForm extends javax.swing.JFrame {
 
