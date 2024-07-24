@@ -160,9 +160,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         btnAdd_NV = new javax.swing.JButton();
         btnUpdate_NV = new javax.swing.JButton();
         btnDelete_NV = new javax.swing.JButton();
-
-        btnMoi = new javax.swing.JButton();
-
+        btnReset = new javax.swing.JButton();
         lblThoat = new javax.swing.JLabel();
         btnFirts = new javax.swing.JButton();
         btnPrev = new javax.swing.JButton();
@@ -250,7 +248,6 @@ public class NhanVienForm extends javax.swing.JFrame {
         });
 
         lblThoat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/recycle_32.png"))); // NOI18N
-        lblThoat.setText("jLabel7");
         lblThoat.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblThoatMouseClicked(evt);
@@ -289,47 +286,57 @@ public class NhanVienForm extends javax.swing.JFrame {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-
-                .addGap(27, 27, 27)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
                 .addComponent(btnAdd_NV)
-                .addGap(0, 57, Short.MAX_VALUE)
+                .addGap(5, 5, 5)
                 .addComponent(btnUpdate_NV)
-                .addGap(35, 35, 35)
+                .addGap(5, 5, 5)
                 .addComponent(btnDelete_NV)
-                .addGap(36, 36, 36)
-                .addComponent(btnMoi)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addGap(5, 5, 5)
+                .addComponent(btnReset)
+                .addGap(84, 84, 84)
+                .addComponent(btnFirts)
+                .addGap(5, 5, 5)
+                .addComponent(btnPrev)
+                .addGap(5, 5, 5)
+                .addComponent(btnNext)
+                .addGap(5, 5, 5)
+                .addComponent(btnLast))
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnFirts)
-                .addGap(18, 18, 18)
-                .addComponent(btnPrev)
-                .addGap(26, 26, 26)
-                .addComponent(btnNext)
-                .addGap(27, 27, 27)
-                .addComponent(btnLast)
-
-                .addContainerGap())
+                .addComponent(lblThoat))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAdd_NV)
-                    .addComponent(btnUpdate_NV)
-                    .addComponent(btnDelete_NV)
-                    .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblThoat)
-                    .addComponent(btnFirts)
-                    .addComponent(btnPrev)
-                    .addComponent(btnNext)
-                    .addComponent(btnLast))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(btnAdd_NV))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(btnUpdate_NV))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(btnDelete_NV))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(btnReset))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(btnFirts))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(btnPrev))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(btnNext))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(btnLast)))
+                .addGap(18, 18, 18)
+                .addComponent(lblThoat)
                 .addContainerGap())
         );
 
@@ -425,7 +432,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtDate)
-                    .addComponent(txtLuong, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
+                    .addComponent(txtLuong)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtMK_NV)
                     .addGroup(jPanel9Layout.createSequentialGroup()
@@ -502,12 +509,18 @@ public class NhanVienForm extends javax.swing.JFrame {
             new String [] {
                 "MÃ NHÂN VIÊN", "TÊN NHÂN VIÊN", "GIỚI TÍNH", "NGÀY VÀO LÀM", "CHỨC VỤ", "LƯƠNG", "MẬT KHẨU"
             }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                true, true, true, true, true, true, false
+            };
 
-        ));
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblStaff.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblStaffMouseClicked(evt);
-
             }
         });
         jScrollPane1.setViewportView(tblStaff);
@@ -535,7 +548,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE))))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -866,13 +879,11 @@ public class NhanVienForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd_NV;
     private javax.swing.JButton btnDelete_NV;
-
     private javax.swing.JButton btnFirts;
     private javax.swing.JButton btnLast;
-    private javax.swing.JButton btnMoi;
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnPrev;
-
+    private javax.swing.JButton btnReset;
     private javax.swing.JButton btnUpdate_NV;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
