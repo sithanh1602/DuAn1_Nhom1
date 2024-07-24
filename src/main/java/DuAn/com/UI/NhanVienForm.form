@@ -172,9 +172,9 @@
                           <Component id="btnUpdate_NV" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                           <Component id="btnDelete_NV" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnReset" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="84" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
                           <Component id="btnFirts" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                           <Component id="btnPrev" min="-2" max="-2" attributes="0"/>
@@ -202,12 +202,11 @@
                                   <Component id="btnUpdate_NV" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
-                                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
-                                  <Component id="btnDelete_NV" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
-                                  <Component id="btnReset" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="4" pref="4" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="btnDelete_NV" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="btnReset" alignment="3" min="-2" pref="37" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Group type="102" attributes="0">
                                   <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
