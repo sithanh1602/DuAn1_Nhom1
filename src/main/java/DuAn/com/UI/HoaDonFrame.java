@@ -17,6 +17,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -85,7 +87,13 @@ public class HoaDonFrame extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 if (evt.getClickCount() == 4) {
-                    loadSelectedRowData2();
+                    try {
+                        loadSelectedRowData2();
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(HoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(HoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         });
@@ -251,15 +259,14 @@ public class HoaDonFrame extends javax.swing.JFrame {
         }
     }
 
-    private void loadSelectedRowData2() {
+    private void loadSelectedRowData2() throws ClassNotFoundException, SQLException {
         int selectedRow = tblHoaDon.getSelectedRow();
 
         String idHoaDon = tblHoaDon.getValueAt(selectedRow, 0).toString();
         txtIDHoaDon.setText(idHoaDon);
 
         // Mở form để hiển thị thông tin chi tiết
-        FormHDCT detailsForm = new FormHDCT();
-        detailsForm.setIdHoaDon(idHoaDon);
+        FormHDCT detailsForm = new FormHDCT();    
         detailsForm.setVisible(true);
 
     }

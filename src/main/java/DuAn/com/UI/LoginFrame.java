@@ -6,6 +6,7 @@ package DuAn.com.UI;
 import DuAn.com.UI.staff.HomeFrameStaff;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import java.awt.Color;
+import static java.awt.Color.red;
 import java.awt.Cursor;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -50,6 +51,8 @@ public class LoginFrame extends javax.swing.JFrame{
         jLabel6.setVisible(false);
         txtUser.setBackground(new java.awt.Color(0, 0, 0, 1));
         txtPass.setBackground(new java.awt.Color(0, 0, 0, 1));
+        lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
     }
     
     private void toggleShowPassword() {
@@ -135,6 +138,7 @@ public class LoginFrame extends javax.swing.JFrame{
         lblOr = new javax.swing.JLabel();
         lblGreen = new javax.swing.JLabel();
         lblBlue = new javax.swing.JLabel();
+        lblForgot = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -220,6 +224,20 @@ public class LoginFrame extends javax.swing.JFrame{
         });
         jPanel2.add(lblBlue, new org.netbeans.lib.awtextra.AbsoluteConstraints(192, 6, -1, -1));
 
+        lblForgot.setText("Forgot password ?");
+        lblForgot.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblForgotMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblForgotMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblForgotMouseExited(evt);
+            }
+        });
+        jPanel2.add(lblForgot, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 310, -1, -1));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -293,6 +311,20 @@ public class LoginFrame extends javax.swing.JFrame{
         };
     }//GEN-LAST:event_btnDangNhapActionPerformed
 
+    private void lblForgotMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblForgotMouseClicked
+        dispose();
+        new quenMK().setVisible(true);
+    }//GEN-LAST:event_lblForgotMouseClicked
+
+    private void lblForgotMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblForgotMouseEntered
+        lblForgot.setText("<html><u>Forgot password ?</u></html>");
+        lblForgot.setForeground(Color.GRAY);
+    }//GEN-LAST:event_lblForgotMouseEntered
+
+    private void lblForgotMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblForgotMouseExited
+        lblForgot.setForeground(Color.BLACK);
+    }//GEN-LAST:event_lblForgotMouseExited
+
     /**
      * @param args the command line arguments
      */
@@ -341,6 +373,7 @@ public class LoginFrame extends javax.swing.JFrame{
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblBlue;
+    private javax.swing.JLabel lblForgot;
     private javax.swing.JLabel lblGreen;
     private javax.swing.JLabel lblOr;
     private javax.swing.JPasswordField txtPass;
