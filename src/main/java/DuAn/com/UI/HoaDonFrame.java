@@ -233,6 +233,8 @@ public class HoaDonFrame extends javax.swing.JFrame {
         txtSoLuong.setText("");
         txtGia.setText("");
         txtTongTien.setText("");
+        txtID_HDCT.setText("");
+        txtMaNV.setText("");
     }
 
     private void loadSelectedRowData() {
