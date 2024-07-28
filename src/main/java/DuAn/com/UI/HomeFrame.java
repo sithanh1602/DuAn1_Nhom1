@@ -429,7 +429,13 @@ public class HomeFrame extends javax.swing.JFrame {
 
     private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed
         dispose();
-        new FormHDCT().setVisible(true);
+        try {
+            new FormHDCT().setVisible(true);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnDHCTActionPerformed
 
     private void btnThongKeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThongKeActionPerformed
