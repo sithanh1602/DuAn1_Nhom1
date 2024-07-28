@@ -100,11 +100,14 @@ public class ThongKeFrame extends javax.swing.JFrame {
                     fetchAndDisplayData_DoanhSo();
                 } else {
                     JOptionPane.showMessageDialog(null, "Ngày bắt đầu không được lớn hơn ngày kết thúc.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
             } else if (minDateStr.isEmpty() || maxDateStr.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin");
+                return;
             } else {
                 JOptionPane.showMessageDialog(null, "Định dạng ngày không hợp lệ. Vui lòng nhập ngày theo định dạng yyyy-MM-dd.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
             }
         }
     }
