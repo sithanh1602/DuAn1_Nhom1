@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package DuAn.com.UI;
+import CheckForm.AutoPasswordEncryption;
 import DuAn.com.UI.staff.HomeFrameStaff;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
@@ -63,45 +64,74 @@ public class LoginFrame extends javax.swing.JFrame{
     }
     
      public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
-        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY;encrypt=true;trustServerCertificate=true;";// them doan cuoi vao url
+        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true;";// them doan cuoi vao url
         String user = "sa";
         String pass = "123456";
         ketNoi = DriverManager.getConnection(url, user, pass);
     }
     
 
-    private void checkAccount() throws ClassNotFoundException, SQLException {
-        String username = txtUser.getText();
-        char[] passwordChars = txtPass.getPassword();
-        String password = new String(passwordChars);
+private void checkAccount() {
+    String username = txtUser.getText();
+    char[] passwordChars = txtPass.getPassword();
+    String password = new String(passwordChars);
+
+    try {
         ketNoiCsdl();
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String sql = "SELECT CHUC_VU FROM NHAN_VIEN WHERE ID_NV = ? AND MAT_KHAU= ?";
-            try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
-                statement.setString(1, username);
-                statement.setString(2, password);
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next()) {
-                    String chucvu = resultSet.getString("CHUC_VU");
-                    if (chucvu.equals("Quản lý")) {
-                        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
-                        this.dispose();
-                        new HomeFrame().setVisible(true);
-                    } else{
-                        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
-                        this.dispose();
-                        new HomeFrameStaff().setVisible(true);
-                    }
+        String sql = "SELECT CHUC_VU, MAT_KHAU FROM NHAN_VIEN WHERE ID_NV = ?";
+        try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String storedPassword = resultSet.getString("MAT_KHAU");
+                String chucvu = resultSet.getString("CHUC_VU");
+
+                if (AutoPasswordEncryption.checkPassword(password, storedPassword)) {
+                    // Nếu mật khẩu đã mã hóa và hợp lệ
+                    handleSuccessfulLogin(chucvu);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                    // Mật khẩu chưa được mã hóa, so sánh mật khẩu trực tiếp
+                    if (password.equals(storedPassword)) {
+                        handleSuccessfulLogin(chucvu);
+
+                        // Mã hóa mật khẩu và cập nhật vào cơ sở dữ liệu
+                        String hashedPassword = AutoPasswordEncryption.hashPassword(password);
+                        String updateQuery = "UPDATE NHAN_VIEN SET MAT_KHAU = ? WHERE ID_NV = ?";
+                        try (PreparedStatement updateStatement = ketNoi.prepareStatement(updateQuery)) {
+                            updateStatement.setString(1, hashedPassword);
+                            updateStatement.setString(2, username);
+                            updateStatement.executeUpdate();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                    }
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Tài khoản không tồn tại!");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Lỗi khi kiểm tra tài khoản: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
     }
-    
+}
+
+
+
+private void handleSuccessfulLogin(String chucvu) {
+    if (chucvu.equals("Quản lý")) {
+        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
+        this.dispose();
+        new HomeFrame().setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
+        this.dispose();
+        new HomeFrameStaff().setVisible(true);
+    }
+}
     public boolean checkVali() {
         if (txtUser.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải nhập tài khoản !");
@@ -302,13 +332,7 @@ public class LoginFrame extends javax.swing.JFrame{
     private void btnDangNhapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDangNhapActionPerformed
         // TODO add your handling code here:
         if (checkVali()) {
-            try {
-                checkAccount();
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            checkAccount();
         };
     }//GEN-LAST:event_btnDangNhapActionPerformed
 
