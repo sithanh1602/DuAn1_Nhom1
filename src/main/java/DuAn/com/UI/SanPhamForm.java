@@ -5,6 +5,7 @@
 package DuAn.com.UI;
 
 import CheckForm.AddID_Auto;
+import CheckForm.ImageRenderer;
 import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -22,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -45,6 +47,24 @@ public class SanPhamForm extends javax.swing.JFrame {
         AddID_Auto addID_Auto = new AddID_Auto();
         addID_Auto.initTextFieldMap(this); // Khởi tạo các JTextField từ lớp NhanVienForm
         addID_Auto.setTextFieldValues(); // Đặt giá trị và tạo mã tự động nếu có
+        // Thiết lập model và renderer cho bảng
+        model = (DefaultTableModel) tblSp.getModel();
+        tblSp.getColumn("Images").setCellRenderer(new ImageRenderer());
+
+        // Thiết lập model và renderer cho bảng
+        tblSp.getColumn("Images").setCellRenderer(new ImageRenderer());
+
+        // Thiết lập kích thước cột
+        setColumnWidth(tblSp.getColumn("Images"), 400); // Cập nhật kích thước cột hình ảnh
+        setColumnWidth(tblSp.getColumn("Mã sãn phẩm"), 70);
+        setColumnWidth(tblSp.getColumn("Tên sản phẩm"), 160);
+        setColumnWidth(tblSp.getColumn("Mã loại sản phẩm"), 70);
+        setColumnWidth(tblSp.getColumn("Mã nhà cung cấp"), 70);
+        setColumnWidth(tblSp.getColumn("Giá tiền"), 70);
+        setColumnWidth(tblSp.getColumn("Số lượng tồn kho"), 70);
+
+        // Thiết lập kích thước hàng và font chữ
+        tblSp.setRowHeight(100); // Thay đổi chiều cao của hàng
     }
 
     public void init() throws ClassNotFoundException, SQLException {
@@ -65,9 +85,17 @@ public class SanPhamForm extends javax.swing.JFrame {
         DoDuLieuLenComboBoxNcc();
 
     }
+    
+     private void setColumnWidth(TableColumn column, int width) {
+        if (column != null) {
+            column.setMinWidth(width);
+            column.setMaxWidth(width);
+            column.setPreferredWidth(width);
+        }
+    }
 
     public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
-        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY;encrypt=true;trustServerCertificate=true";// them doan cuoi vao url
+        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true";// them doan cuoi vao url
         String user = "sa";
         String pass = "123456";
         ketNoi = DriverManager.getConnection(url, user, pass);
@@ -131,14 +159,14 @@ public class SanPhamForm extends javax.swing.JFrame {
         String sql = "SELECT * FROM SAN_PHAM";
         PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
         ResultSet ketQua = cauLenh.executeQuery();
-        while (ketQua.next() == true) {
+        while (ketQua.next()) {
             String idSP = ketQua.getString(1);
             String tenSp = ketQua.getString(2);
             String idLsp = ketQua.getString(3);
             String idNcc = ketQua.getString(4);
             int giaTien = ketQua.getInt(5);
             int soLuong = ketQua.getInt(6);
-            String link = ketQua.getString(7);
+            String link = ketQua.getString(7); // Đường dẫn đến hình ảnh
             model.addRow(new Object[]{idSP, tenSp, idLsp, idNcc, giaTien, soLuong, link});
         }
         tblSp.setModel(model);
@@ -157,7 +185,7 @@ public class SanPhamForm extends javax.swing.JFrame {
             lblPic.setIcon(icon);
         }
     }
-    
+
     public void clear() {
         txtIDSP.setText("");
         txtTenSP.setText("");
@@ -167,8 +195,8 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtGiaTien.setText("");
         lblPic.setIcon(null);
     }
-    
-    public void listenCBo(){
+
+    public void listenCBo() {
         tblSp.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 int selectedRow = tblSp.getSelectedRow();
@@ -207,22 +235,22 @@ public class SanPhamForm extends javax.swing.JFrame {
             }
         });
     }
-    
-    public boolean kiemTraRong(){
-        if(txtMalsp.getText().equals("")){
+
+    public boolean kiemTraRong() {
+        if (txtMalsp.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Lấy mã loại sản phẩm bằng cách chọn tên loại sản phẩm!");
             return false;
         }
-        if(txtTenSP.getText().equals("")){
+        if (txtTenSP.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên sản phẩm!");
             return false;
         }
-        if(txtMancc.getText().equals("")){
+        if (txtMancc.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Lấy mã nhà cung cấp bằng cách chọn tên nhà cung cấp!");
             return false;
         }
-        
-        if(txtSoLuong.getText().equals("")){
+
+        if (txtSoLuong.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập giá tiền!");
             return false;
         }
@@ -232,7 +260,7 @@ public class SanPhamForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Giá tiền phải là số!");
             return false;
         }
-        if(txtSoLuong.getText().equals("")){
+        if (txtSoLuong.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập số lượng kho!");
             return false;
         }
@@ -244,7 +272,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         }
         return true;
     }
-    
+
     public void fillBtn() {
         int selectedRow = tblSp.getSelectedRow();
         if (selectedRow < 0) {
@@ -260,10 +288,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
         displayImage(imagePath);
     }
-    
-    
-    
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -583,7 +608,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                     .addComponent(btnSua)
                     .addComponent(btnXoa)
                     .addComponent(btnMoi, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(btnFirts, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -670,11 +695,12 @@ public class SanPhamForm extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(23, 23, 23)
                 .addComponent(jLabel7)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -684,8 +710,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1))
         );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -720,12 +745,12 @@ public class SanPhamForm extends javax.swing.JFrame {
                     .addComponent(jLabel1))
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(7, 7, 7)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -883,21 +908,22 @@ public class SanPhamForm extends javax.swing.JFrame {
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
         try {
             //kiểm tra mã không trùng, kiểm tra rổnng
-            if(kiemTraRong()==true){
-            ketNoiCsdl();
-            String sql = "INSERT INTO SAN_PHAM(ID_SP,TEN_SP,ID_LSP,ID_NHA_CC,GIA,SL_TONKHO,HINH) VALUES(?, ?, ?, ?, ?,?,?)";
-            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-            cauLenh.setString(1, txtIDSP.getText());
-            cauLenh.setString(2, txtTenSP.getText());
-            cauLenh.setString(3, txtMalsp.getText());
-            cauLenh.setString(4, txtMancc.getText());
-            cauLenh.setInt(5, Integer.parseInt(txtGiaTien.getText()));
-            cauLenh.setInt(6, Integer.parseInt(txtSoLuong.getText()));
-            cauLenh.setString(7, link);
+            if (kiemTraRong() == true) {
+                ketNoiCsdl();
+                String sql = "INSERT INTO SAN_PHAM(ID_SP,TEN_SP,ID_LSP,ID_NHA_CC,GIA,SL_TONKHO,HINH) VALUES(?, ?, ?, ?, ?,?,?)";
+                PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
+                cauLenh.setString(1, txtIDSP.getText());
+                cauLenh.setString(2, txtTenSP.getText());
+                cauLenh.setString(3, txtMalsp.getText());
+                cauLenh.setString(4, txtMancc.getText());
+                cauLenh.setInt(5, Integer.parseInt(txtGiaTien.getText()));
+                cauLenh.setInt(6, Integer.parseInt(txtSoLuong.getText()));
+                cauLenh.setString(7, link);
 
-            cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
-            TaiDulieuVaoBang();
-            ketNoi.close();}
+                cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
+                TaiDulieuVaoBang();
+                ketNoi.close();
+            }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -987,7 +1013,7 @@ public class SanPhamForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNextActionPerformed
 
     private void btnLastActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastActionPerformed
-        int ViTri = tblSp.getRowCount()-1;
+        int ViTri = tblSp.getRowCount() - 1;
         tblSp.setRowSelectionInterval(ViTri, ViTri);
         fillBtn();
     }//GEN-LAST:event_btnLastActionPerformed

@@ -27,7 +27,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class NhanVienForm extends javax.swing.JFrame {
 
-    String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
+    String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY3;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
     public NhanVienForm() {
         initComponents();

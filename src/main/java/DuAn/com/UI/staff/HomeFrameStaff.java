@@ -120,7 +120,7 @@ public class HomeFrameStaff extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 441, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblWatch)
                 .addContainerGap())
         );
@@ -150,6 +150,11 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         btnDoiMatKhau.setFocusable(false);
         btnDoiMatKhau.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDoiMatKhau.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDoiMatKhau.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDoiMatKhauActionPerformed(evt);
+            }
+        });
         jToolBar2.add(btnDoiMatKhau);
 
         btnHuongDan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Earth Planet.png"))); // NOI18N
@@ -206,6 +211,11 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         btnNcc.setText("Nhà cung cấp");
         btnNcc.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnNcc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnNcc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNccActionPerformed(evt);
+            }
+        });
 
         btnDonHang.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Price Tag USD.png"))); // NOI18N
         btnDonHang.setText("Đơn hàng");
@@ -221,11 +231,21 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         btnLoaiSP.setText("Loại sản phẩm");
         btnLoaiSP.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnLoaiSP.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnLoaiSP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoaiSPActionPerformed(evt);
+            }
+        });
 
         btnDHCT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/More Details.png"))); // NOI18N
         btnDHCT.setText("Đơn hàng chi tiết");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDHCT.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDHCT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDHCTActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -317,40 +337,34 @@ public class HomeFrameStaff extends javax.swing.JFrame {
 
     private void btnDangXuatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDangXuatActionPerformed
         dispose();
-        //new FormLogin().setVisible(true);
+        new LoginFrame().setVisible(true);
     }//GEN-LAST:event_btnDangXuatActionPerformed
 
     private void btnKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKhachHangActionPerformed
 //        dispose();
 //        try {
-//            new FormNH().setVisible(true);
+//            new KhachHangFormStaff().setVisible(true);
 //        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
 //        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
 //        }
     }//GEN-LAST:event_btnKhachHangActionPerformed
 
     private void btnSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSanPhamActionPerformed
 //        dispose();
 //        try {
-//            new FormCD().setVisible(true);
+//            new SanPhamFormStaff().setVisible(true);
 //        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
 //        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
 //        }
     }//GEN-LAST:event_btnSanPhamActionPerformed
 
     private void btnDonHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDonHangActionPerformed
-//        dispose();
-//        try {
-//            new FormKHQL().setVisible(true);
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        dispose();
+       // new HoaDonFrameStaff().setVisible(true);
     }//GEN-LAST:event_btnDonHangActionPerformed
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
@@ -368,6 +382,44 @@ public class HomeFrameStaff extends javax.swing.JFrame {
     private void lblOrMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOrMouseClicked
         System.exit(0);
     }//GEN-LAST:event_lblOrMouseClicked
+
+    private void btnNccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNccActionPerformed
+//        dispose();
+//        try {
+//            new NhaCungCapFormStaff().setVisible(true);
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }//GEN-LAST:event_btnNccActionPerformed
+
+    private void btnLoaiSPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoaiSPActionPerformed
+//        dispose();
+//        try {
+//            new LoaiSPFrameStaff().setVisible(true);
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }//GEN-LAST:event_btnLoaiSPActionPerformed
+
+    private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed
+//        dispose();
+//        try {
+//            new FormHDCTStaff().setVisible(true);
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }//GEN-LAST:event_btnDHCTActionPerformed
+
+    private void btnDoiMatKhauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoiMatKhauActionPerformed
+        dispose();
+        new DoiMatKhauFrame().setVisible(true);
+    }//GEN-LAST:event_btnDoiMatKhauActionPerformed
 
     /**
      * @param args the command line arguments
