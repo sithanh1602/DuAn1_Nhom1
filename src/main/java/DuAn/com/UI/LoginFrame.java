@@ -5,6 +5,7 @@
 package DuAn.com.UI;
 import DuAn.com.UI.staff.HomeFrameStaff;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Color;
 import static java.awt.Color.red;
 import java.awt.Cursor;
@@ -168,7 +169,7 @@ public class LoginFrame extends javax.swing.JFrame{
                 jLabel5MouseClicked(evt);
             }
         });
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 200, -1, -1));
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 200, -1, -1));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/eyeExit.png"))); // NOI18N
         jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -176,7 +177,7 @@ public class LoginFrame extends javax.swing.JFrame{
                 jLabel6MouseClicked(evt);
             }
         });
-        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 200, -1, -1));
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 200, -1, -1));
 
         txtPass.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 153, 255)));
         jPanel2.add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 199, 239, 28));
@@ -351,8 +352,8 @@ public class LoginFrame extends javax.swing.JFrame{
             java.util.logging.Logger.getLogger(LoginFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //FlatMacDarkLaf.setup();
-        FlatIntelliJLaf.setup();
+        FlatMacDarkLaf.setup();
+        //FlatIntelliJLaf.setup();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

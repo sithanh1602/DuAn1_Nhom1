@@ -53,7 +53,7 @@ public class KhachHangForm extends javax.swing.JFrame {
     }
     
     public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
-        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY;encrypt=true;trustServerCertificate=true";// them doan cuoi vao url
+        String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true";// them doan cuoi vao url
         String user = "sa";
         String pass = "123456";
         ketNoi = DriverManager.getConnection(url, user, pass);

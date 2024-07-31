@@ -4,16 +4,15 @@
  */
 package DuAn.com.UI;
 
+import CheckForm.Hide_Password;
 import java.awt.Cursor;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ThongKeFrame extends javax.swing.JFrame {
 
-    String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
+    String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY3;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
     /**
      * Creates new form ThongKeFrame
@@ -32,6 +31,91 @@ public class ThongKeFrame extends javax.swing.JFrame {
         initComponents();
         init();
         loadTable_Kho();
+        txtMaxDate.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    loadTable_HDCT();
+                    loadTable_Doanhso();
+                }
+            }
+        });
+
+    }
+
+    private void loadTable_HDCT() {
+        DefaultTableModel model = (DefaultTableModel) tblHDCT_TK.getModel();
+        model.setRowCount(0); // Clear all rows in the table before filling it with new data
+        String minDate = txtMinDate.getText();
+        String maxDate = txtMaxDate.getText();
+        String query = "SELECT A.ID_HOA_DON, SUM(A.SO_LUONG) AS SL_BAN, B.NGAY_HOA_DON, B.TONG_TIEN "
+                + "FROM CHI_TIET_HOA_DON A INNER JOIN HOA_DON B ON A.ID_HOA_DON = B.ID_HOA_DON "
+                + "WHERE B.NGAY_HOA_DON BETWEEN ? AND ? "
+                + "GROUP BY A.ID_HOA_DON, B.NGAY_HOA_DON, B.TONG_TIEN";
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+            pst.setString(1, minDate);
+            pst.setString(2, maxDate);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String ID = rs.getString("ID_HOA_DON");
+                    String soLuongBan = rs.getString("SL_BAN");
+                    String ngayBan = rs.getString("NGAY_HOA_DON");
+                    String tongTien = rs.getString("TONG_TIEN");
+
+                    model.addRow(new Object[]{ID, soLuongBan, ngayBan, tongTien});
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị HDCT thống kê: " + ex.getMessage());
+        }
+    }
+
+    private void loadTable_Doanhso() {
+        DefaultTableModel model = (DefaultTableModel) tblDoanhSo.getModel();
+        model.setRowCount(0); // Clear all rows in the table before filling it with new data
+        String minDate = txtMinDate.getText();
+        String maxDate = txtMaxDate.getText();
+        String query = "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP_BAN,SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_DOANHTHU FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON WHERE NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_NV, TEN_NV, TONG_TIEN";
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+            pst.setString(1, minDate);
+            pst.setString(2, maxDate);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String ID = rs.getString("ID_NV");
+                    String soLuongBan = rs.getString("TEN_NV");
+                    String ngayBan = rs.getString("TONG_SP_BAN");
+                    String tongTien = rs.getString("TONG_SP_BAN");
+                                        String tongDOANHTHU = rs.getString("TONG_DOANHTHU");
+
+
+                    model.addRow(new Object[]{ID, soLuongBan, ngayBan, tongTien, tongDOANHTHU});
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị HDCT thống kê: " + ex.getMessage());
+        }
+    }
+
+    private void loadTable_Kho() {
+        DefaultTableModel model = (DefaultTableModel) tblKho_TK.getModel();
+        model.setRowCount(0); // Clear all rows in the table before filling it with new data
+        String query = "SELECT ID_SP, TEN_SP, SUM(SL_TONKHO) AS SO_TON_KHO FROM SAN_PHAM A GROUP BY ID_SP, TEN_SP";
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String ID = rs.getString("ID_SP");
+                    String name = rs.getString("TEN_SP");
+                    String Gender = rs.getString("SO_TON_KHO");
+
+                    // Add a new row to the table with the course information
+                    model.addRow(new Object[]{ID, name, Gender});
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị người học thống kê: " + ex.getMessage());
+        }
+
+        // Apply the password renderer to the password column (assuming it's column 6)
     }
 
     public void init() {
@@ -44,141 +128,7 @@ public class ThongKeFrame extends javax.swing.JFrame {
         });
         lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
-        txtMinDate.addFocusListener(new DateFieldFocusListener());
-        txtMaxDate.addFocusListener(new DateFieldFocusListener());
-    }
 
-    private void loadTable_Kho() {
-        DefaultTableModel model = (DefaultTableModel) tblKho_TK.getModel();
-        model.setRowCount(0); // Clear all rows in the table before filling it with new data
-        String query = "SELECT ID_SP, A.TEN_SP,COUNT(DISTINCT A.ID_LSP) AS TONG_LOAI_SP, COUNT(DISTINCT A.ID_NHA_CC) AS TONG_NHA_CC, SUM(SL_TONKHO) AS TONG_SL_TONKHO FROM SAN_PHAM A INNER JOIN LOAI_SP B ON A.ID_LSP = B.ID_LSP GROUP BY ID_SP, TEN_SP;";
-        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
-            try ( ResultSet rs = pst.executeQuery()) {
-                while (rs.next()) {
-                    String ID = rs.getString("ID_SP");
-                    String tenSP = rs.getString("TEN_SP");
-                    String loai = rs.getString("TONG_LOAI_SP");
-                    String nha = rs.getString("TONG_NHA_CC");
-                    String kho = rs.getString("TONG_SL_TONKHO");
-
-                    // Add a new row to the table with the course information
-                    model.addRow(new Object[]{ID, tenSP, nha, kho, loai});
-                }
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị người học thống kê: " + ex.getMessage());
-        }
-
-        // Apply the password renderer to the password column (assuming it's column 6)
-    }
-
-    private class DateFieldFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent e) {
-        }
-
-        private boolean isMinDateBeforeOrEqualToMaxDate(String minDateStr, String maxDateStr) {
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date minDate = sdf.parse(minDateStr);
-                Date maxDate = sdf.parse(maxDateStr);
-                return !minDate.after(maxDate);
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            String minDateStr = txtMinDate.getText();
-            String maxDateStr = txtMaxDate.getText();
-
-            if (isDateValid(minDateStr) && isDateValid(maxDateStr)) {
-                if (isMinDateBeforeOrEqualToMaxDate(minDateStr, maxDateStr)) {
-                    fetchAndDisplayData();
-                    fetchAndDisplayData_DoanhSo();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Ngày bắt đầu không được lớn hơn ngày kết thúc.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            } else if (minDateStr.isEmpty() || maxDateStr.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin");
-                return;
-            } else {
-                JOptionPane.showMessageDialog(null, "Định dạng ngày không hợp lệ. Vui lòng nhập ngày theo định dạng yyyy-MM-dd.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-    }
-
-    private boolean isDateValid(String dateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            sdf.setLenient(false);
-            sdf.parse(dateStr);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private void fetchAndDisplayData() {
-        String minDate = txtMinDate.getText();
-        String maxDate = txtMaxDate.getText();
-        DefaultTableModel model = (DefaultTableModel) tblHDCT_TK.getModel();
-        model.setRowCount(0); // Clear existing data
-
-        try ( Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;");  PreparedStatement ps = conn.prepareStatement("SELECT ID_HOA_DON_CT, A.SO_LUONG, NGAYBAN_HANG, A.TONG_TIEN FROM HOA_DON A INNER JOIN HOA_DON_CHI_TIET B ON A.ID_HOA_DON = B.ID_HOA_DON WHERE NGAYBAN_HANG >= ? AND NGAYBAN_HANG <= ?")) {
-
-            ps.setString(1, minDate);
-            ps.setString(2, maxDate);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getString("ID_HOA_DON_CT"),
-                    rs.getInt("SO_LUONG"),
-                    rs.getDate("NGAYBAN_HANG"),
-                    rs.getDouble("TONG_TIEN")
-                };
-                model.addRow(row);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
-        }
-    }
-
-    private void fetchAndDisplayData_DoanhSo() {
-        String minDate = txtMinDate.getText();
-        String maxDate = txtMaxDate.getText();
-        DefaultTableModel model = (DefaultTableModel) tblDoanhSo.getModel();
-        model.setRowCount(0); // Clear existing data
-
-        try ( Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;");  PreparedStatement ps = conn.prepareStatement(
-                "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP, SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_TIEN "
-                + "FROM NHAN_VIEN A "
-                + "INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV "
-                + "WHERE NGAYBAN_HANG >= ? AND NGAYBAN_HANG <= ? "
-                + "GROUP BY A.ID_NV, TEN_NV")) {
-
-            ps.setString(1, minDate);
-            ps.setString(2, maxDate);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getString("ID_NV"),
-                    rs.getString("TEN_NV"),
-                    rs.getInt("TONG_SP"),
-                    rs.getInt("TONG_SL_BAN"),
-                    rs.getDouble("TONG_TIEN")
-                };
-                model.addRow(row);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
-        }
     }
 
     /**
@@ -311,13 +261,13 @@ public class ThongKeFrame extends javax.swing.JFrame {
 
         tblKho_TK.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "ID sản phẩm", "Tên sản phẩm", "Tổng nhà cung cấp", "Số lượng tồn kho", "Tổng loại sản phẩm"
+                "ID sản phẩm", "Tên sản phẩm", "Số lượng tồn kho"
             }
         ));
         jScrollPane2.setViewportView(tblKho_TK);
