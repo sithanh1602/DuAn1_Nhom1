@@ -126,6 +126,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
         ketNoi.close();
     }
 
+
     public void tenCotBang1() {
         model.addColumn("Mã hoá đơn");
         model.addColumn("Mã nhân viên");
@@ -136,6 +137,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
         model.addColumn("Tiền thừa");
         model.addColumn("Ghi chú");
         tblHoaDon.setModel(model);
+
     }
 
     public void tenCotBangChiTiet() {
