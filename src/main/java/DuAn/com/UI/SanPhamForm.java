@@ -85,8 +85,8 @@ public class SanPhamForm extends javax.swing.JFrame {
         DoDuLieuLenComboBoxNcc();
 
     }
-    
-     private void setColumnWidth(TableColumn column, int width) {
+
+    private void setColumnWidth(TableColumn column, int width) {
         if (column != null) {
             column.setMinWidth(width);
             column.setMaxWidth(width);
@@ -287,6 +287,69 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
         String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
         displayImage(imagePath);
+    }
+
+    private void deleteProduct() {
+        int viTri = tblSp.getSelectedRowCount();
+        if (viTri == 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String productId = txtIDSP.getText();
+
+        // Check if the product is in any invoice
+        try {
+            ketNoiCsdl();
+            String sqlCheckExistence = "SELECT COUNT(*) FROM CHI_TIET_HOA_DON WHERE ID_SP = ?";
+            PreparedStatement stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+            stmtCheckExistence.setString(1, productId);
+
+            ResultSet rs = stmtCheckExistence.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count > 0) {
+                JOptionPane.showMessageDialog(this, "Sản phẩm đang tồn tại trong hóa đơn và không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                rs.close();
+                stmtCheckExistence.close();
+                ketNoi.close();
+                return;
+            }
+
+            // Proceed with deletion
+            String sqlDelete = "DELETE FROM SAN_PHAM WHERE ID_SP = ?";
+            PreparedStatement stmtDelete = ketNoi.prepareStatement(sqlDelete);
+            stmtDelete.setString(1, productId);
+            stmtDelete.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+            TaiDulieuVaoBang(); // Refresh the table data
+            clear(); // Clear input fields
+
+            rs.close();
+            stmtCheckExistence.close();
+            stmtDelete.close();
+            ketNoi.close();
+
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi xử lý cơ sở dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public boolean kiemTraTrungMa() throws ClassNotFoundException, SQLException {
+        ketNoiCsdl();
+        String sql = "SELECT ID_SP FROM SAN_PHAM";// có thể bắt cccd hay sdt ...
+        PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
+        ResultSet ketQua = cauLenh.executeQuery();
+        while (ketQua.next() == true) {
+            if (ketQua.getString(1).equalsIgnoreCase(txtIDSP.getText())) { // dò mã nhập vào kết quả coi có trùng ko có bắt lỗi
+                JOptionPane.showMessageDialog(this, "Mã sản phẩm đã tồn tại!");
+                return true;
+            }
+        }
+        return false;// mã sinh viên không trùng 
     }
 
     /**
@@ -710,7 +773,8 @@ public class SanPhamForm extends javax.swing.JFrame {
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1))
+                .addComponent(jScrollPane1)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -907,28 +971,60 @@ public class SanPhamForm extends javax.swing.JFrame {
 
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
         try {
-            //kiểm tra mã không trùng, kiểm tra rổnng
-            if (kiemTraRong() == true) {
+            // Kiểm tra mã không trùng, kiểm tra rỗng
+            if (kiemTraRong()) {
                 ketNoiCsdl();
-                String sql = "INSERT INTO SAN_PHAM(ID_SP,TEN_SP,ID_LSP,ID_NHA_CC,GIA,SL_TONKHO,HINH) VALUES(?, ?, ?, ?, ?,?,?)";
-                PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-                cauLenh.setString(1, txtIDSP.getText());
-                cauLenh.setString(2, txtTenSP.getText());
-                cauLenh.setString(3, txtMalsp.getText());
-                cauLenh.setString(4, txtMancc.getText());
-                cauLenh.setInt(5, Integer.parseInt(txtGiaTien.getText()));
-                cauLenh.setInt(6, Integer.parseInt(txtSoLuong.getText()));
-                cauLenh.setString(7, link);
 
-                cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
+                // Check if the product ID already exists
+                String sqlCheckExistence = "SELECT COUNT(*) FROM SAN_PHAM WHERE ID_SP = ?";
+                PreparedStatement stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+                stmtCheckExistence.setString(1, txtIDSP.getText());
+
+                ResultSet rs = stmtCheckExistence.executeQuery();
+                rs.next();
+                int count = rs.getInt(1);
+
+                if (count > 0) {
+                    // Product ID already exists
+                    JOptionPane.showMessageDialog(this, "Mã sản phẩm đã tồn tại. Vui lòng sử dụng mã khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    rs.close();
+                    stmtCheckExistence.close();
+                    ketNoi.close();
+                    return;
+                }
+
+                // Insert new product
+                String sqlInsert = "INSERT INTO SAN_PHAM(ID_SP, TEN_SP, ID_LSP, ID_NHA_CC, GIA, SL_TONKHO, HINH) VALUES(?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmtInsert = ketNoi.prepareStatement(sqlInsert);
+                stmtInsert.setString(1, txtIDSP.getText());
+                stmtInsert.setString(2, txtTenSP.getText());
+                stmtInsert.setString(3, txtMalsp.getText());
+                stmtInsert.setString(4, txtMancc.getText());
+                stmtInsert.setInt(5, Integer.parseInt(txtGiaTien.getText()));
+                stmtInsert.setInt(6, Integer.parseInt(txtSoLuong.getText()));
+                stmtInsert.setString(7, link);
+
+                int rowsAffected = stmtInsert.executeUpdate(); // Execute the update
+                if (rowsAffected > 0) {
+                    // Show success message
+                    JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                // Refresh data
                 TaiDulieuVaoBang();
+                stmtInsert.close();
+                stmtCheckExistence.close();
                 ketNoi.close();
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
+
+
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void btnSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuaActionPerformed
@@ -964,22 +1060,23 @@ public class SanPhamForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtManccKeyPressed
 
     private void btnXoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaActionPerformed
-        int ViTri = tblSp.getSelectedRowCount();
-        try {
-            ketNoiCsdl();
-            String sql = "DELETE SAN_PHAM WHERE ID_SP=?";
-            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-            cauLenh.setString(1, txtIDSP.getText());
-            cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
-            TaiDulieuVaoBang();
-            JOptionPane.showMessageDialog(this, "Xoá thành công!");
-            clear();
-            ketNoi.close();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        int ViTri = tblSp.getSelectedRowCount();
+//        try {
+//            ketNoiCsdl();
+//            String sql = "DELETE SAN_PHAM WHERE ID_SP=?";
+//            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
+//            cauLenh.setString(1, txtIDSP.getText());
+//            cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
+//            TaiDulieuVaoBang();
+//            JOptionPane.showMessageDialog(this, "Xoá thành công!");
+//            clear();
+//            ketNoi.close();
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        deleteProduct();
     }//GEN-LAST:event_btnXoaActionPerformed
 
     private void btnMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoiActionPerformed
