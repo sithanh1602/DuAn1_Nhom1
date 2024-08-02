@@ -11,6 +11,8 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,6 +26,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -352,6 +359,52 @@ public class SanPhamForm extends javax.swing.JFrame {
         return false;// mã sinh viên không trùng 
     }
 
+    private void exportToExcel() {
+    Workbook workbook = new XSSFWorkbook();
+    Sheet sheet = workbook.createSheet("Products");
+
+    // Tạo dòng tiêu đề
+    Row headerRow = sheet.createRow(0);
+    String[] columns = {"Mã sản phẩm", "Tên sản phẩm", "Mã loại sản phẩm", "Mã nhà cung cấp", "Giá tiền", "Số lượng tồn kho", "Images"};
+    for (int i = 0; i < columns.length; i++) {
+        Cell cell = headerRow.createCell(i);
+        cell.setCellValue(columns[i]);
+    }
+
+    // Nhập dữ liệu vào các dòng
+    DefaultTableModel model = (DefaultTableModel) tblSp.getModel();
+    for (int i = 0; i < model.getRowCount(); i++) {
+        Row row = sheet.createRow(i + 1);
+        for (int j = 0; j < model.getColumnCount(); j++) {
+            Cell cell = row.createCell(j);
+            Object value = model.getValueAt(i, j);
+            if (value != null) {
+                // Chuyển đổi giá trị thành chuỗi cho ô
+                cell.setCellValue(value.toString());
+            }
+        }
+    }
+
+    // Đường dẫn đến thư mục lưu file
+    String filePath = "D:\\DuAn1_GR1\\excel\\SanPhamData.xlsx";
+
+    // Ghi dữ liệu ra file
+    try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+        workbook.write(fileOut);
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Lỗi khi ghi file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+    }
+
+    try {
+        workbook.close();
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Lỗi khi đóng file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+    }
+
+    JOptionPane.showMessageDialog(this, "Xuất dữ liệu hoàn tất! File được lưu tại: " + filePath);
+}
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -402,6 +455,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         tblSp = new javax.swing.JTable();
         txtSearch = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        btnExcel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -646,6 +700,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                 .addGap(0, 27, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnFirts)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnPrev)
@@ -753,6 +808,13 @@ public class SanPhamForm extends javax.swing.JFrame {
 
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Search.png"))); // NOI18N
 
+        btnExcel.setText("Excel");
+        btnExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcelActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -762,7 +824,9 @@ public class SanPhamForm extends javax.swing.JFrame {
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(23, 23, 23)
                 .addComponent(jLabel7)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnExcel)
+                .addContainerGap())
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
@@ -771,7 +835,8 @@ public class SanPhamForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
+                    .addComponent(jLabel7)
+                    .addComponent(btnExcel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1)
                 .addContainerGap())
@@ -1115,6 +1180,10 @@ public class SanPhamForm extends javax.swing.JFrame {
         fillBtn();
     }//GEN-LAST:event_btnLastActionPerformed
 
+    private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
+        exportToExcel();
+    }//GEN-LAST:event_btnExcelActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1157,6 +1226,7 @@ public class SanPhamForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExcel;
     private javax.swing.JButton btnFirts;
     private javax.swing.JButton btnLast;
     private javax.swing.JButton btnMoi;

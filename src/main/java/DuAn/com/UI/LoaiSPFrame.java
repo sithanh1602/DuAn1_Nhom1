@@ -94,6 +94,20 @@ public class LoaiSPFrame extends javax.swing.JFrame {
         return true;
     }
 
+
+    public boolean kiemTraTrungTen() throws ClassNotFoundException, SQLException {
+        ketNoiCsdl();
+        String sql = "SELECT TEN_LOAI_SP FROM LOAI_SP WHERE TEN_LOAI_SP = ?";
+        PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
+        cauLenh.setString(1, txtLoaiSP.getText());
+        ResultSet ketQua = cauLenh.executeQuery();
+        if (ketQua.next()) {
+            JOptionPane.showMessageDialog(this, "Tên loại sản phẩm đã tồn tại!");
+            return true;
+        }
+        return false;
+    }
+
     public boolean kiemTraTrungMa() throws ClassNotFoundException, SQLException {
         ketNoiCsdl();
         String sql = "SELECT ID_LSP FROM LOAI_SP";// có thể bắt cccd hay sdt ...
@@ -355,7 +369,7 @@ public class LoaiSPFrame extends javax.swing.JFrame {
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
         try {
             //kiểm tra mã không trùng, kiểm tra rổnng
-            if (kiemTraRong() && kiemTraTrungMa() == false) {
+            if (kiemTraRong() && kiemTraTrungMa() == false && !kiemTraTrungTen()) {
                 ketNoiCsdl();
                 String sql = "INSERT INTO LOAI_SP(ID_LSP,TEN_LOAI_SP,GHICHU) VALUES(?, ?, ?)";
                 PreparedStatement cauLenh = ketNoi.prepareStatement(sql);

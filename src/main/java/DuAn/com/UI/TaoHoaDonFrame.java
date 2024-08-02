@@ -33,7 +33,6 @@ import javax.swing.table.TableColumnModel;
  * @author NITRO 5
  */
 public class TaoHoaDonFrame extends javax.swing.JFrame {
-
     DefaultTableModel model = new DefaultTableModel();
     DefaultTableModel model1 = new DefaultTableModel();
     DefaultTableModel model2 = new DefaultTableModel();
@@ -49,6 +48,8 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         init();
         model = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
         model1 = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
+        model2 = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
+        model3 = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
         // Khởi tạo model cho JTable
         tenCotBang1();
         tenCotBang2();
@@ -145,8 +146,10 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         });
 
         updateInvoiceList();
+        
 
     }
+
 
     private void calculateTienThua() {
         try {
@@ -209,128 +212,134 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
     }
 
     private void createInvoice() {
-    Connection ketNoi = null;
-    PreparedStatement stmtInsertHoaDon = null;
-    PreparedStatement stmtInsertChiTiet = null;
-    PreparedStatement stmtUpdateStock = null;
+        Connection ketNoi = null;
+        PreparedStatement stmtInsertHoaDon = null;
+        PreparedStatement stmtInsertChiTiet = null;
+        PreparedStatement stmtUpdateStock = null;
 
-    try {
-        // Collect information from input fields
-        String tenKH = txtTenKH.getText();
-        String sdt = txtSdt.getText();
-        String diaChi = txtDiaChi.getText();
-        int tongTien = Integer.parseInt(txtTongTien.getText());
-        int tienKhach = Integer.parseInt(txtKhachDua.getText());
-        int tienThua = Integer.parseInt(txtTienThua.getText());
-        String ghiChu = txtGhiChu.getText();
+        try {
+            // Collect information from input fields
+            String tenKH = txtTenKH.getText();
+            String sdt = txtSdt.getText();
+            String diaChi = txtDiaChi.getText();
+            int tongTien = Integer.parseInt(txtTongTien.getText());
+            int tienKhach = Integer.parseInt(txtKhachDua.getText());
+            int tienThua = Integer.parseInt(txtTienThua.getText());
+            String ghiChu = txtGhiChu.getText();
 
-        // Get payment method
-        String paymentMethod = (String) cboThanhToan.getSelectedItem();
-        if (paymentMethod == null || paymentMethod.trim().isEmpty() || paymentMethod.equals("Phương thức thanh toán")) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn phương thức thanh toán.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            // Get payment method
+            String paymentMethod = (String) cboThanhToan.getSelectedItem();
+            if (paymentMethod == null || paymentMethod.trim().isEmpty() || paymentMethod.equals("Phương thức thanh toán")) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn phương thức thanh toán.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        // Get delivery status
-        String status;
-        if (rdoGiaoHang.isSelected()) {
-            status = "Đã thanh toán, Đang giao hàng";
-        } else {
-            status = "Đã thanh toán";
-        }
+            // Get delivery status
+            String status;
+            if (rdoGiaoHang.isSelected()) {
+                status = "Đã thanh toán, Đang giao hàng";
+            } else {
+                status = "Đã thanh toán";
+            }
 
-        // Generate invoice ID
-        String idHoaDon = generateInvoiceId();
-        String idNV = "NV01"; // Example, replace with actual employee ID
+            // Generate invoice ID
+            String idHoaDon = generateInvoiceId();
+            String idNV = "NV01"; // Example, replace with actual employee ID
 
-        // Connect to the database
-        ketNoi = DriverManager.getConnection(
-                "jdbc:sqlserver://localhost:1433;databaseName=DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true",
-                "sa", "123456");
+            // Connect to the database
+            ketNoi = DriverManager.getConnection(
+                    "jdbc:sqlserver://localhost:1433;databaseName=DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true",
+                    "sa", "123456");
 
-        // Get customer ID
-        String idKH = getCustomerIdByName(tenKH, ketNoi);
-        if (idKH == null) {
-            JOptionPane.showMessageDialog(this, "Khách hàng không tồn tại.");
-            return;
-        }
+            // Get customer ID
+            String idKH = getCustomerIdByName(tenKH, ketNoi);
+            if (idKH == null) {
+                JOptionPane.showMessageDialog(this, "Khách hàng không tồn tại.");
+                return;
+            }
 
-        // Insert invoice
-        String sqlInsertHoaDon = "INSERT INTO HOA_DON (ID_HOA_DON, ID_NV, ID_KH, NGAY_HOA_DON, TONG_TIEN, TIEN_KHACH_DUA, TIEN_THUA, GHICHU, TRANG_THAI) "
-                + "VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)";
-        stmtInsertHoaDon = ketNoi.prepareStatement(sqlInsertHoaDon);
-        stmtInsertHoaDon.setString(1, idHoaDon);
-        stmtInsertHoaDon.setString(2, idNV);
-        stmtInsertHoaDon.setString(3, idKH);
-        stmtInsertHoaDon.setInt(4, tongTien);
-        stmtInsertHoaDon.setInt(5, tienKhach);
-        stmtInsertHoaDon.setInt(6, tienThua);
-        stmtInsertHoaDon.setString(7, ghiChu);
-        stmtInsertHoaDon.setString(8, status);
-        stmtInsertHoaDon.executeUpdate();
-
-        // Insert invoice details
-        String sqlInsertChiTiet = "INSERT INTO CHI_TIET_HOA_DON (ID_HOA_DON, ID_SP, SO_LUONG, DON_GIA, THANH_TIEN) "
-                + "VALUES (?, ?, ?, ?, ?)";
-        stmtInsertChiTiet = ketNoi.prepareStatement(sqlInsertChiTiet);
-
-        // Update stock for each product
-        String sqlUpdateStock = "UPDATE SAN_PHAM SET SL_TONKHO = SL_TONKHO - ? WHERE ID_SP = ?";
-        stmtUpdateStock = ketNoi.prepareStatement(sqlUpdateStock);
-
-        for (int i = 0; i < model1.getRowCount(); i++) {
-            String maSP = (String) model1.getValueAt(i, 1);
-            int soLuong = (Integer) model1.getValueAt(i, 3);
-            int donGia = (Integer) model1.getValueAt(i, 4);
-            int thanhTien = (Integer) model1.getValueAt(i, 5);
+            // Insert invoice
+            String sqlInsertHoaDon = "INSERT INTO HOA_DON (ID_HOA_DON, ID_NV, ID_KH, NGAY_HOA_DON, TONG_TIEN, TIEN_KHACH_DUA, TIEN_THUA, GHICHU, TRANG_THAI) "
+                    + "VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)";
+            stmtInsertHoaDon = ketNoi.prepareStatement(sqlInsertHoaDon);
+            stmtInsertHoaDon.setString(1, idHoaDon);
+            stmtInsertHoaDon.setString(2, idNV);
+            stmtInsertHoaDon.setString(3, idKH);
+            stmtInsertHoaDon.setInt(4, tongTien);
+            stmtInsertHoaDon.setInt(5, tienKhach);
+            stmtInsertHoaDon.setInt(6, tienThua);
+            stmtInsertHoaDon.setString(7, ghiChu);
+            stmtInsertHoaDon.setString(8, status);
+            stmtInsertHoaDon.executeUpdate();
 
             // Insert invoice details
-            stmtInsertChiTiet.setString(1, idHoaDon);
-            stmtInsertChiTiet.setString(2, maSP);
-            stmtInsertChiTiet.setInt(3, soLuong);
-            stmtInsertChiTiet.setInt(4, donGia);
-            stmtInsertChiTiet.setInt(5, thanhTien);
-            stmtInsertChiTiet.addBatch();
+            String sqlInsertChiTiet = "INSERT INTO CHI_TIET_HOA_DON (ID_HOA_DON, ID_SP, SO_LUONG, DON_GIA, THANH_TIEN) "
+                    + "VALUES (?, ?, ?, ?, ?)";
+            stmtInsertChiTiet = ketNoi.prepareStatement(sqlInsertChiTiet);
 
-            // Update stock
-            stmtUpdateStock.setInt(1, soLuong);
-            stmtUpdateStock.setString(2, maSP);
-            stmtUpdateStock.addBatch();
-        }
+            // Update stock for each product
+            String sqlUpdateStock = "UPDATE SAN_PHAM SET SL_TONKHO = SL_TONKHO - ? WHERE ID_SP = ?";
+            stmtUpdateStock = ketNoi.prepareStatement(sqlUpdateStock);
 
-        stmtInsertChiTiet.executeBatch();
-        stmtUpdateStock.executeBatch();
+            for (int i = 0; i < model1.getRowCount(); i++) {
+                String maSP = (String) model1.getValueAt(i, 1);
+                int soLuong = (Integer) model1.getValueAt(i, 3);
+                int donGia = (Integer) model1.getValueAt(i, 4);
+                int thanhTien = (Integer) model1.getValueAt(i, 5);
 
-        // Update invoice list
-        updateInvoiceList();
+                // Insert invoice details
+                stmtInsertChiTiet.setString(1, idHoaDon);
+                stmtInsertChiTiet.setString(2, maSP);
+                stmtInsertChiTiet.setInt(3, soLuong);
+                stmtInsertChiTiet.setInt(4, donGia);
+                stmtInsertChiTiet.setInt(5, thanhTien);
+                stmtInsertChiTiet.addBatch();
 
-        // Clear tblGh after saving
-        model1.setRowCount(0);
-        calculateTotalAmount();
+                // Update stock
+                stmtUpdateStock.setInt(1, soLuong);
+                stmtUpdateStock.setString(2, maSP);
+                stmtUpdateStock.addBatch();
+            }
 
-        // Show success message
-        JOptionPane.showMessageDialog(this, "Hóa đơn đã được tạo thành công.");
+            stmtInsertChiTiet.executeBatch();
+            stmtUpdateStock.executeBatch();
 
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu.");
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số.");
-    } finally {
-        // Close connections
-        try {
-            if (stmtInsertHoaDon != null) stmtInsertHoaDon.close();
-            if (stmtInsertChiTiet != null) stmtInsertChiTiet.close();
-            if (stmtUpdateStock != null) stmtUpdateStock.close();
-            if (ketNoi != null) ketNoi.close();
+            // Update invoice list
+            updateInvoiceList();
+
+            // Clear tblGh after saving
+            model1.setRowCount(0);
+            calculateTotalAmount();
+
+            // Show success message
+            JOptionPane.showMessageDialog(this, "Hóa đơn đã được tạo thành công.");
+
         } catch (SQLException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu.");
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số.");
+        } finally {
+            // Close connections
+            try {
+                if (stmtInsertHoaDon != null) {
+                    stmtInsertHoaDon.close();
+                }
+                if (stmtInsertChiTiet != null) {
+                    stmtInsertChiTiet.close();
+                }
+                if (stmtUpdateStock != null) {
+                    stmtUpdateStock.close();
+                }
+                if (ketNoi != null) {
+                    ketNoi.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
+        clearProductTable();
     }
-    clearProductTable();
-}
-
-
 
     private void clearProductTable() {
         model1.setRowCount(0);
@@ -450,25 +459,24 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         tblGh.setModel(model1);
     }
 
-   public void tenCotBangHoaDon() {
-    model2.addColumn("STT");
-    model2.addColumn("Mã hóa đơn");
-    model2.addColumn("Tên NV");
-    model2.addColumn("Tên KH");
-    model2.addColumn("Trạng thái");
-    model2.addColumn("Ngày tạo");
-    tblHoaDon.setModel(model2);
+    public void tenCotBangHoaDon() {
+        model2.addColumn("STT");
+        model2.addColumn("Mã hóa đơn");
+        model2.addColumn("Tên NV");
+        model2.addColumn("Tên KH");
+        model2.addColumn("Trạng thái");
+        model2.addColumn("Ngày tạo");
+        tblHoaDon.setModel(model2);
 
-    // Set column widths
-    TableColumnModel columnModel = tblHoaDon.getColumnModel();
-    columnModel.getColumn(0).setPreferredWidth(50); // Set width for "STT" column
-    columnModel.getColumn(1).setPreferredWidth(100); // Set width for "Mã hóa đơn" column
-    columnModel.getColumn(2).setPreferredWidth(150); // Set width for "Tên NV" column
-    columnModel.getColumn(3).setPreferredWidth(150); // Set width for "Tên KH" column
-    columnModel.getColumn(4).setPreferredWidth(100); // Set width for "Trạng thái" column
-    columnModel.getColumn(5).setPreferredWidth(100); // Set width for "Ngày tạo" column
-}
-
+        // Set column widths
+        TableColumnModel columnModel = tblHoaDon.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(50); // Set width for "STT" column
+        columnModel.getColumn(1).setPreferredWidth(100); // Set width for "Mã hóa đơn" column
+        columnModel.getColumn(2).setPreferredWidth(150); // Set width for "Tên NV" column
+        columnModel.getColumn(3).setPreferredWidth(150); // Set width for "Tên KH" column
+        columnModel.getColumn(4).setPreferredWidth(100); // Set width for "Trạng thái" column
+        columnModel.getColumn(5).setPreferredWidth(100); // Set width for "Ngày tạo" column
+    }
 
     public void tenCotBangHoaDonCT() {
         model3.addColumn("Mã sản phẩm");
@@ -601,6 +609,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Bill.png"))); // NOI18N
         jLabel1.setText("Thanh toán");
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Danh sách sản phẩm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
@@ -662,8 +671,10 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnXoa)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(btnXoa)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane3)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -886,8 +897,8 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblOr))
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
@@ -930,7 +941,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 12, Short.MAX_VALUE))
         );
 
         pack();
