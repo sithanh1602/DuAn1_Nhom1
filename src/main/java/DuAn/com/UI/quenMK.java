@@ -4,7 +4,7 @@
  */
 package DuAn.com.UI;
 
-import com.email.DatabaseHelper;
+import DuAn.com.email.DatabaseHelper;
 import com.email.EmailSender;
 import javax.swing.JOptionPane;
 
@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
  */
 public class quenMK extends javax.swing.JFrame {
 
+    private String verificationCode;
+
     /**
      * Creates new form quenMK
      */
@@ -21,7 +23,11 @@ public class quenMK extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
     }
-           
+
+    private String generateResetCode() {
+        // Generate a random 6-digit code
+        return String.format("%06d", (int) (Math.random() * 1000000));
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -43,6 +49,9 @@ public class quenMK extends javax.swing.JFrame {
         txtEmail = new javax.swing.JTextField();
         btnSubmit = new javax.swing.JButton();
         lblThoat = new javax.swing.JLabel();
+        txtMaXacNhan = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        btnGuiEmail = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -89,36 +98,52 @@ public class quenMK extends javax.swing.JFrame {
             }
         });
 
+        jLabel5.setText("Nhập lại mã xác nhận");
+
+        btnGuiEmail.setText("Gửi");
+        btnGuiEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuiEmailActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblThoat)
-                .addGap(100, 100, 100)
-                .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(138, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(txtIDNV)
-                                .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-                                .addComponent(jLabel2))
-                            .addComponent(jLabel3))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 194, Short.MAX_VALUE)
                         .addComponent(lblBlue)
                         .addGap(6, 6, 6)
                         .addComponent(lblGreen)
                         .addGap(6, 6, 6)
-                        .addComponent(lblOr)))
+                        .addComponent(lblOr))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblThoat))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(39, 39, 39)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                .addGap(93, 93, 93)
+                                                .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnGuiEmail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jLabel5)
+                                    .addComponent(txtIDNV, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(txtMaXacNhan, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -132,6 +157,10 @@ public class quenMK extends javax.swing.JFrame {
                         .addComponent(lblGreen)
                         .addComponent(lblOr)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblThoat)
+                        .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(36, 36, 36)
                         .addComponent(jLabel3)
@@ -140,14 +169,16 @@ public class quenMK extends javax.swing.JFrame {
                         .addGap(24, 24, 24)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnGuiEmail))
                         .addGap(18, 18, 18)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtMaXacNhan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                         .addComponent(btnSubmit)
-                        .addContainerGap(27, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblThoat)
-                        .addContainerGap())))
+                        .addGap(55, 55, 55))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -165,11 +196,7 @@ public class quenMK extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
-        if(this.getExtendedState() != LoginFrame.MAXIMIZED_BOTH){
-            this.setExtendedState(LoginFrame.MAXIMIZED_BOTH);
-        }else{
-            this.setExtendedState(LoginFrame.NORMAL);
-        }
+
     }//GEN-LAST:event_lblBlueMouseClicked
 
     private void lblGreenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblGreenMouseClicked
@@ -181,18 +208,16 @@ public class quenMK extends javax.swing.JFrame {
     }//GEN-LAST:event_lblOrMouseClicked
 
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
-        String username = txtIDNV.getText();
-        String email = txtEmail.getText();
+        String enteredCode = txtMaXacNhan.getText().trim();
+        String employeeID = txtIDNV.getText().trim(); // Get the employee ID
 
-        if (DatabaseHelper.isEmailRegistered(email)) {
-            // Tạo liên kết đặt lại mật khẩu
-            String resetLink = "http://yourwebsite.com/reset-password?email=" + email;
-
-            // Gửi email
-            EmailSender.sendResetPasswordEmail(email, resetLink);
-            JOptionPane.showMessageDialog(this, "Email đã được gửi đến " + email);
+        if (enteredCode.equals(verificationCode)) {
+            // Create an instance of CapNhapPassForgot with the employee ID
+            CapNhapPassForgot form = new CapNhapPassForgot(employeeID);
+            form.setVisible(true);
+            this.dispose(); // Close the current form
         } else {
-            JOptionPane.showMessageDialog(this, "Email không tồn tại");
+            JOptionPane.showMessageDialog(this, "Mã xác nhận không hợp lệ!");
         }
     }//GEN-LAST:event_btnSubmitActionPerformed
 
@@ -200,6 +225,24 @@ public class quenMK extends javax.swing.JFrame {
         dispose();
         new LoginFrame().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
+
+    private void btnGuiEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuiEmailActionPerformed
+        String id = txtIDNV.getText().trim();
+        String email = txtEmail.getText().trim();
+
+        if (DatabaseHelper.isEmployeeExists(id, email)) {
+            verificationCode = generateResetCode();  // Generate and store the verification code
+            EmailSender.sendResetPasswordEmail(email, verificationCode);
+            JOptionPane.showMessageDialog(this, "Mã xác nhận đã được gửi đến email!");
+
+            // Switch to the verification code input panel
+            txtMaXacNhan.setVisible(true);
+            jLabel5.setVisible(true);
+            btnSubmit.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Mã nhân viên hoặc email không hợp lệ!");
+        }
+    }//GEN-LAST:event_btnGuiEmailActionPerformed
 
     /**
      * @param args the command line arguments
@@ -237,10 +280,12 @@ public class quenMK extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnGuiEmail;
     private javax.swing.JButton btnSubmit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblBlue;
     private javax.swing.JLabel lblGreen;
@@ -248,5 +293,6 @@ public class quenMK extends javax.swing.JFrame {
     private javax.swing.JLabel lblThoat;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtIDNV;
+    private javax.swing.JTextField txtMaXacNhan;
     // End of variables declaration//GEN-END:variables
 }
