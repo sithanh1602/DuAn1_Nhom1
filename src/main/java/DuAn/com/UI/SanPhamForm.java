@@ -5,6 +5,7 @@
 package DuAn.com.UI;
 
 import CheckForm.AddID_Auto;
+import CheckForm.CurrencyFormatter;
 import CheckForm.ImageRenderer;
 import java.awt.Cursor;
 import java.awt.Image;
@@ -49,6 +50,7 @@ public class SanPhamForm extends javax.swing.JFrame {
      */
     public SanPhamForm() throws ClassNotFoundException, SQLException {
         initComponents();
+        CurrencyFormatter currencyFormatter = new CurrencyFormatter(this);
         init();
         listenCBo();
         AddID_Auto addID_Auto = new AddID_Auto();
@@ -199,7 +201,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtMalsp.setText("");
         txtMancc.setText("");
         txtSoLuong.setText("");
-        txtGiaTien.setText("");
+        txtGiaTienMoney.setText("");
         lblPic.setIcon(null);
     }
 
@@ -215,7 +217,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                 txtTenSP.setText(String.valueOf(model.getValueAt(selectedRow, 1)));
                 txtMalsp.setText(String.valueOf(model.getValueAt(selectedRow, 2)));
                 txtMancc.setText(String.valueOf(model.getValueAt(selectedRow, 3)));
-                txtGiaTien.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
+                txtGiaTienMoney.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
                 txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
                 String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
                 displayImage(imagePath);
@@ -262,9 +264,12 @@ public class SanPhamForm extends javax.swing.JFrame {
             return false;
         }
         try {
-            Integer.parseInt(txtGiaTien.getText());
+            String salaryText = txtGiaTienMoney.getText().trim().replace(",", "").replace(" VND", "");
+            double Salary = Double.parseDouble(salaryText);
+
+            // Check if salary is above the minimum threshold
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Giá tiền phải là số!");
+            JOptionPane.showMessageDialog(this, "Lương phải là số hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         if (txtSoLuong.getText().equals("")) {
@@ -290,7 +295,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtTenSP.setText(String.valueOf(model.getValueAt(selectedRow, 1)));
         txtMalsp.setText(String.valueOf(model.getValueAt(selectedRow, 2)));
         txtMancc.setText(String.valueOf(model.getValueAt(selectedRow, 3)));
-        txtGiaTien.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
+        txtGiaTienMoney.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
         txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
         String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
         displayImage(imagePath);
@@ -360,50 +365,49 @@ public class SanPhamForm extends javax.swing.JFrame {
     }
 
     private void exportToExcel() {
-    Workbook workbook = new XSSFWorkbook();
-    Sheet sheet = workbook.createSheet("Products");
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Products");
 
-    // Tạo dòng tiêu đề
-    Row headerRow = sheet.createRow(0);
-    String[] columns = {"Mã sản phẩm", "Tên sản phẩm", "Mã loại sản phẩm", "Mã nhà cung cấp", "Giá tiền", "Số lượng tồn kho", "Images"};
-    for (int i = 0; i < columns.length; i++) {
-        Cell cell = headerRow.createCell(i);
-        cell.setCellValue(columns[i]);
-    }
+        // Tạo dòng tiêu đề
+        Row headerRow = sheet.createRow(0);
+        String[] columns = {"Mã sản phẩm", "Tên sản phẩm", "Mã loại sản phẩm", "Mã nhà cung cấp", "Giá tiền", "Số lượng tồn kho", "Images"};
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columns[i]);
+        }
 
-    // Nhập dữ liệu vào các dòng
-    DefaultTableModel model = (DefaultTableModel) tblSp.getModel();
-    for (int i = 0; i < model.getRowCount(); i++) {
-        Row row = sheet.createRow(i + 1);
-        for (int j = 0; j < model.getColumnCount(); j++) {
-            Cell cell = row.createCell(j);
-            Object value = model.getValueAt(i, j);
-            if (value != null) {
-                // Chuyển đổi giá trị thành chuỗi cho ô
-                cell.setCellValue(value.toString());
+        // Nhập dữ liệu vào các dòng
+        DefaultTableModel model = (DefaultTableModel) tblSp.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Row row = sheet.createRow(i + 1);
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                Cell cell = row.createCell(j);
+                Object value = model.getValueAt(i, j);
+                if (value != null) {
+                    // Chuyển đổi giá trị thành chuỗi cho ô
+                    cell.setCellValue(value.toString());
+                }
             }
         }
+
+        // Đường dẫn đến thư mục lưu file
+        String filePath = "D:\\DuAn1_GR1\\excel\\SanPhamData.xlsx";
+
+        // Ghi dữ liệu ra file
+        try ( FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi ghi file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+
+        try {
+            workbook.close();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi đóng file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+
+        JOptionPane.showMessageDialog(this, "Xuất dữ liệu hoàn tất! File được lưu tại: " + filePath);
     }
-
-    // Đường dẫn đến thư mục lưu file
-    String filePath = "D:\\DuAn1_GR1\\excel\\SanPhamData.xlsx";
-
-    // Ghi dữ liệu ra file
-    try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-        workbook.write(fileOut);
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Lỗi khi ghi file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-    }
-
-    try {
-        workbook.close();
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Lỗi khi đóng file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-    }
-
-    JOptionPane.showMessageDialog(this, "Xuất dữ liệu hoàn tất! File được lưu tại: " + filePath);
-}
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -431,7 +435,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtTenSP = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtGiaTien = new javax.swing.JTextField();
+        txtGiaTienMoney = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtSoLuong = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
@@ -575,7 +579,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                             .addComponent(jLabel6)
                             .addComponent(jLabel8)
                             .addComponent(txtIDSP, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtGiaTien)
+                            .addComponent(txtGiaTienMoney)
                             .addComponent(txtSoLuong))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
@@ -608,7 +612,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtGiaTien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtGiaTienMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -984,7 +988,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtTenSP.setText(String.valueOf(model.getValueAt(selectedRow, 1)));
         txtMalsp.setText(String.valueOf(model.getValueAt(selectedRow, 2)));
         txtMancc.setText(String.valueOf(model.getValueAt(selectedRow, 3)));
-        txtGiaTien.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
+        txtGiaTienMoney.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
         txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
         String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
         displayImage(imagePath);
@@ -1058,6 +1062,10 @@ public class SanPhamForm extends javax.swing.JFrame {
                     return;
                 }
 
+                // Remove currency formatting from the price field
+                String formattedPrice = txtGiaTienMoney.getText().trim();
+                formattedPrice = formattedPrice.replace(",", "").replace(" VND", "");
+
                 // Insert new product
                 String sqlInsert = "INSERT INTO SAN_PHAM(ID_SP, TEN_SP, ID_LSP, ID_NHA_CC, GIA, SL_TONKHO, HINH) VALUES(?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement stmtInsert = ketNoi.prepareStatement(sqlInsert);
@@ -1065,7 +1073,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                 stmtInsert.setString(2, txtTenSP.getText());
                 stmtInsert.setString(3, txtMalsp.getText());
                 stmtInsert.setString(4, txtMancc.getText());
-                stmtInsert.setInt(5, Integer.parseInt(txtGiaTien.getText()));
+                stmtInsert.setInt(5, Integer.parseInt(formattedPrice));
                 stmtInsert.setInt(6, Integer.parseInt(txtSoLuong.getText()));
                 stmtInsert.setString(7, link);
 
@@ -1088,32 +1096,66 @@ public class SanPhamForm extends javax.swing.JFrame {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi khi thêm sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-
-
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void btnSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuaActionPerformed
-        try {
+        try {       
             ketNoiCsdl();
-            String sql = "UPDATE SAN_PHAM SET TEN_SP=?, ID_LSP=?, ID_NHA_CC=?, GIA=?, SL_TONKHO=?, HINH=? WHERE ID_SP=?";
-            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-            cauLenh.setString(1, txtTenSP.getText());
-            cauLenh.setString(2, txtMalsp.getText());
-            cauLenh.setString(3, txtMancc.getText());
-            cauLenh.setInt(4, Integer.parseInt(txtGiaTien.getText()));
-            cauLenh.setInt(5, Integer.parseInt(txtSoLuong.getText()));
-            cauLenh.setString(6, link);
-            cauLenh.setString(7, txtIDSP.getText()); // Tham số ID_SP là tham số cuối cùng
 
-            cauLenh.executeUpdate(); // Có thay đổi thì dùng executeUpdate (thêm, sửa, xoá)
+            // Remove currency formatting from the price field
+            String formattedPrice = txtGiaTienMoney.getText().trim();
+            formattedPrice = formattedPrice.replace(",", "").replace(" VND", "");
+
+            // Check if the product ID exists
+            String sqlCheckExistence = "SELECT COUNT(*) FROM SAN_PHAM WHERE ID_SP = ?";
+            PreparedStatement stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+            stmtCheckExistence.setString(1, txtIDSP.getText());
+
+            ResultSet rs = stmtCheckExistence.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count == 0) {
+                // Product ID does not exist
+                JOptionPane.showMessageDialog(this, "Mã sản phẩm không tồn tại. Vui lòng kiểm tra lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                rs.close();
+                stmtCheckExistence.close();
+                ketNoi.close();
+                return;
+            }
+
+            // Update existing product
+            String sqlUpdate = "UPDATE SAN_PHAM SET TEN_SP=?, ID_LSP=?, ID_NHA_CC=?, GIA=?, SL_TONKHO=?, HINH=? WHERE ID_SP=?";
+            PreparedStatement stmtUpdate = ketNoi.prepareStatement(sqlUpdate);
+            stmtUpdate.setString(1, txtTenSP.getText());
+            stmtUpdate.setString(2, txtMalsp.getText());
+            stmtUpdate.setString(3, txtMancc.getText());
+            stmtUpdate.setInt(4, Integer.parseInt(formattedPrice));
+            stmtUpdate.setInt(5, Integer.parseInt(txtSoLuong.getText()));
+            stmtUpdate.setString(6, link);
+            stmtUpdate.setString(7, txtIDSP.getText());
+
+            int rowsAffected = stmtUpdate.executeUpdate(); // Execute the update
+            if (rowsAffected > 0) {
+                // Show success message
+                JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // No rows affected, indicating an issue
+                JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Refresh data
             TaiDulieuVaoBang();
+            stmtUpdate.close();
+            stmtCheckExistence.close();
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-
     }//GEN-LAST:event_btnSuaActionPerformed
 
     private void txtManccKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtManccKeyReleased
@@ -1261,7 +1303,7 @@ public class SanPhamForm extends javax.swing.JFrame {
     private javax.swing.JLabel lblPic;
     private javax.swing.JLabel lblThoat;
     private javax.swing.JTable tblSp;
-    private javax.swing.JTextField txtGiaTien;
+    private javax.swing.JTextField txtGiaTienMoney;
     private javax.swing.JTextField txtIDSP;
     private javax.swing.JTextField txtMalsp;
     private javax.swing.JTextField txtMancc;

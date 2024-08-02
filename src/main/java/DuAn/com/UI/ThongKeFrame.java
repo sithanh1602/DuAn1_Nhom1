@@ -4,26 +4,31 @@
  */
 package DuAn.com.UI;
 
-import CheckForm.Hide_Password;
+import CheckForm.DateFormatter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 
 /**
  *
@@ -39,6 +44,17 @@ public class ThongKeFrame extends javax.swing.JFrame {
     public ThongKeFrame() {
         initComponents();
         init();
+        JFrame frame = new JFrame("Pie Charts Example");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new GridLayout(1, 3));
+
+        // Add panels to the frame
+        frame.add(pnlChartSoLuongBan);
+        frame.add(pnlChartKho);
+        frame.add(pnlChartDoanhSo);
+
+        frame.pack();
+        frame.setVisible(true);
         loadTable_Kho();
         txtMaxDate.addKeyListener(new KeyAdapter() {
             @Override
@@ -46,29 +62,176 @@ public class ThongKeFrame extends javax.swing.JFrame {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     loadTable_HDCT();
                     loadTable_Doanhso();
+                    loadChart();
                 }
             }
         });
+        DateFormatter dateFormatter = new DateFormatter(this);
+        createChartPanel();
         ChartPanel chartPanel = createChartPanel();
-        pnlChart.setLayout(new BorderLayout());
-        pnlChart.add(chartPanel, BorderLayout.CENTER);
+        // Tạo biểu đồ và thêm chúng vào các panel tương ứng
+        pnlChartSoLuongBan.setLayout(new BorderLayout());
+        pnlChartSoLuongBan.add(createChartPanel(createDatasetSoLuongBan()), BorderLayout.CENTER);
+
+        pnlChartKho.setLayout(new BorderLayout());
+        pnlChartKho.add(createChartPanel(createDatasetKho()), BorderLayout.CENTER);
+
+        pnlChartDoanhSo.setLayout(new BorderLayout());
+        pnlChartDoanhSo.add(createChartPanel(createDatasetDoanhSo()), BorderLayout.CENTER);
+
     }
-      private ChartPanel createChartPanel() {
+
+    private ChartPanel createChartPanel(PieDataset dataset) {
+        JFreeChart chart = ChartFactory.createPieChart(
+                "Biểu đồ", // Tiêu đề biểu đồ
+                dataset, // Dữ liệu cho biểu đồ
+                true, // Hiển thị chú thích
+                true,
+                false
+        );
+        return new ChartPanel(chart);
+    }
+
+    private static JPanel createChartPanel(JFreeChart chart) {
+        ChartPanel panel = new ChartPanel(chart) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension size = super.getPreferredSize();
+                if (size.width > 300) {
+                    size.width = 300; // Set max width
+                }
+                if (size.height > 300) {
+                    size.height = 300; // Set max height
+                }
+                return size;
+            }
+        };
+        panel.setPreferredSize(new Dimension(300, 300)); // Set preferred size
+        return panel;
+    }
+     private PieDataset createDatasetKho() {
+    DefaultPieDataset dataset = new DefaultPieDataset();
+
+    String minDate = txtMinDate.getText();
+    String maxDate = txtMaxDate.getText();
+    String query = "SELECT ID_SP, TEN_SP, SUM(SL_TONKHO) AS SO_TON_KHO FROM SAN_PHAM A GROUP BY ID_SP, TEN_SP";
+
+    try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                String productName = rs.getString("TEN_SP");
+                int stockQuantity = rs.getInt("SO_TON_KHO");
+                dataset.setValue(productName, stockQuantity);
+            }
+        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ tồn kho: " + ex.getMessage());
+    }
+
+    return dataset;
+}
+
+private PieDataset createDatasetDoanhSo() {
+    DefaultPieDataset dataset = new DefaultPieDataset();
+
+    String minDate = txtMinDate.getText();
+    String maxDate = txtMaxDate.getText();
+    String query = "SELECT A.ID_NV, TEN_NV, SUM(TONG_TIEN) AS TONG_DOANHTHU " +
+                   "FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV " +
+                   "INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON " +
+                   "WHERE NGAY_HOA_DON BETWEEN ? AND ? " +
+                   "GROUP BY A.ID_NV, TEN_NV";
+
+    try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setString(1, minDate);
+        pst.setString(2, maxDate);
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                String employeeName = rs.getString("TEN_NV");
+                double totalRevenue = rs.getDouble("TONG_DOANHTHU");
+                dataset.setValue(employeeName, totalRevenue);
+            }
+        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ doanh thu: " + ex.getMessage());
+    }
+
+    return dataset;
+}
+
+
+
+    private PieDataset createDatasetSoLuongBan() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+
+        String minDate = txtMinDate.getText();
+        String maxDate = txtMaxDate.getText();
+        String query = "SELECT A.ID_HOA_DON, SUM(A.SO_LUONG) AS SL_BAN, B.NGAY_HOA_DON, B.TONG_TIEN, TEN_SP  FROM CHI_TIET_HOA_DON A INNER JOIN HOA_DON B ON A.ID_HOA_DON = B.ID_HOA_DON INNER JOIN SAN_PHAM C ON C.ID_SP = C.ID_SP WHERE B.NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_HOA_DON, B.NGAY_HOA_DON, B.TONG_TIEN, TEN_SP";
+        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+            pst.setString(1, minDate);
+            pst.setString(2, maxDate);
+            try ( ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String productName = rs.getString("TEN_SP");
+                    int soldQuantity = rs.getInt("SL_BAN");
+                    dataset.setValue(productName, soldQuantity);
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ số lượng bán: " + ex.getMessage());
+        }
+
+        return dataset;
+    }
+
+    private JFreeChart createPieChart(PieDataset dataset, String title) {
+        JFreeChart chart = ChartFactory.createPieChart(
+                title, // chart title
+                dataset, // data
+                true, // include legend
+                true,
+                false);
+
+        // Optional: Customize the chart appearance here
+        return chart;
+    }
+
+// Usage example:
+    private void loadCharts() {
+        PieDataset datasetSoLuongBan = createDatasetSoLuongBan();
+        JFreeChart chartSoLuongBan = createPieChart(datasetSoLuongBan, "Số lượng bán");
+        addChartToPanel(pnlChartSoLuongBan, chartSoLuongBan);
+        // Repeat for other charts (Doanh số, Kho) by creating corresponding datasets and adding them to the respective panels
+    }
+
+    private void addChartToPanel(JPanel panel, JFreeChart chart) {
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(panel.getWidth(), panel.getHeight()));
+        panel.setLayout(new BorderLayout());
+        panel.add(chartPanel, BorderLayout.CENTER);
+        panel.validate();
+    }
+
+  
+
+  
+
+    private ChartPanel createChartPanel() {
         // Create a dataset
         CategoryDataset dataset = createDataset();
-        
+
         // Create a chart based on the dataset
         JFreeChart chart = ChartFactory.createBarChart(
-                "Sales Statistics",     // Chart title
-                "Category",             // X-axis Label
-                "Value",                // Y-axis Label
-                dataset,                // Dataset
-                org.jfree.chart.plot.PlotOrientation.VERTICAL, 
-                true,                   // Include legend
-                true,                   // Tooltips
-                false                   // URLs
+                "Sales Statistics", // Chart title
+                "Category", // X-axis Label
+                "Value", // Y-axis Label
+                dataset, // Dataset
+                org.jfree.chart.plot.PlotOrientation.VERTICAL,
+                true, // Include legend
+                true, // Tooltips
+                false // URLs
         );
-         
+
         // Customize the chart
         chart.setBackgroundPaint(Color.white);
 
@@ -77,22 +240,22 @@ public class ThongKeFrame extends javax.swing.JFrame {
         chartPanel.setPreferredSize(new Dimension(700, 500));
         return chartPanel;
     }
-          private CategoryDataset createDataset() {
+
+    private CategoryDataset createDataset() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         // Fetch data from the database and add it to the dataset
         String query = "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP_BAN, SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_DOANHTHU "
-                     + "FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON "
-                     + "WHERE NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_NV, TEN_NV";
+                + "FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON "
+                + "WHERE NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_NV, TEN_NV";
 
-        try (Connection con = DriverManager.getConnection(url);
-             PreparedStatement pst = con.prepareStatement(query)) {
+        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
 
             // Set the parameters for the query
             pst.setString(1, "2024-01-01"); // Example start date
             pst.setString(2, "2024-12-31"); // Example end date
 
-            try (ResultSet rs = pst.executeQuery()) {
+            try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String employeeName = rs.getString("TEN_NV");
                     int totalProductsSold = rs.getInt("TONG_SP_BAN");
@@ -107,7 +270,6 @@ public class ThongKeFrame extends javax.swing.JFrame {
         return dataset;
     }
 
-
     private void loadTable_HDCT() {
         DefaultTableModel model = (DefaultTableModel) tblHDCT_TK.getModel();
         model.setRowCount(0); // Clear all rows in the table before filling it with new data
@@ -117,10 +279,10 @@ public class ThongKeFrame extends javax.swing.JFrame {
                 + "FROM CHI_TIET_HOA_DON A INNER JOIN HOA_DON B ON A.ID_HOA_DON = B.ID_HOA_DON "
                 + "WHERE B.NGAY_HOA_DON BETWEEN ? AND ? "
                 + "GROUP BY A.ID_HOA_DON, B.NGAY_HOA_DON, B.TONG_TIEN";
-        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
             pst.setString(1, minDate);
             pst.setString(2, maxDate);
-            try (ResultSet rs = pst.executeQuery()) {
+            try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String ID = rs.getString("ID_HOA_DON");
                     String soLuongBan = rs.getString("SL_BAN");
@@ -141,17 +303,16 @@ public class ThongKeFrame extends javax.swing.JFrame {
         String minDate = txtMinDate.getText();
         String maxDate = txtMaxDate.getText();
         String query = "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP_BAN,SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_DOANHTHU FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON WHERE NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_NV, TEN_NV, TONG_TIEN";
-        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
             pst.setString(1, minDate);
             pst.setString(2, maxDate);
-            try (ResultSet rs = pst.executeQuery()) {
+            try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String ID = rs.getString("ID_NV");
                     String soLuongBan = rs.getString("TEN_NV");
                     String ngayBan = rs.getString("TONG_SP_BAN");
                     String tongTien = rs.getString("TONG_SP_BAN");
-                                        String tongDOANHTHU = rs.getString("TONG_DOANHTHU");
-
+                    String tongDOANHTHU = rs.getString("TONG_DOANHTHU");
 
                     model.addRow(new Object[]{ID, soLuongBan, ngayBan, tongTien, tongDOANHTHU});
                 }
@@ -165,8 +326,8 @@ public class ThongKeFrame extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) tblKho_TK.getModel();
         model.setRowCount(0); // Clear all rows in the table before filling it with new data
         String query = "SELECT ID_SP, TEN_SP, SUM(SL_TONKHO) AS SO_TON_KHO FROM SAN_PHAM A GROUP BY ID_SP, TEN_SP";
-        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
-            try (ResultSet rs = pst.executeQuery()) {
+        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+            try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String ID = rs.getString("ID_SP");
                     String name = rs.getString("TEN_SP");
@@ -181,6 +342,17 @@ public class ThongKeFrame extends javax.swing.JFrame {
         }
 
         // Apply the password renderer to the password column (assuming it's column 6)
+    }
+
+    private void loadChart() {
+        PieDataset soLuongBanDataset = createDatasetSoLuongBan();
+        addChartToPanel(pnlChartSoLuongBan, createPieChart(soLuongBanDataset, "Số lượng bán"));
+
+        PieDataset khoDataset = createDatasetKho();
+        addChartToPanel(pnlChartKho, createPieChart(khoDataset, "Kho"));
+
+        PieDataset doanhSoDataset = createDatasetDoanhSo();
+        addChartToPanel(pnlChartDoanhSo, createPieChart(doanhSoDataset, "Doanh số"));
     }
 
     public void init() {
@@ -229,9 +401,14 @@ public class ThongKeFrame extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         tblDoanhSo = new javax.swing.JTable();
         pnlChart = new javax.swing.JPanel();
+        pnlChartSoLuongBan = new javax.swing.JPanel();
+        pnlChartKho = new javax.swing.JPanel();
+        pnlChartDoanhSo = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Circle Chart.png"))); // NOI18N
@@ -286,7 +463,7 @@ public class ThongKeFrame extends javax.swing.JFrame {
                         .addComponent(jLabel3)
                         .addGap(37, 37, 37)
                         .addComponent(txtMaxDate, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 177, Short.MAX_VALUE)
                         .addComponent(lblThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -361,35 +538,78 @@ public class ThongKeFrame extends javax.swing.JFrame {
 
         Kho.addTab("Doanh số", jPanel7);
 
-        javax.swing.GroupLayout pnlChartLayout = new javax.swing.GroupLayout(pnlChart);
-        pnlChart.setLayout(pnlChartLayout);
-        pnlChartLayout.setHorizontalGroup(
-            pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        pnlChartLayout.setVerticalGroup(
-            pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 369, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Kho))
+                .addComponent(Kho)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(Kho, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                .addComponent(Kho, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout pnlChartSoLuongBanLayout = new javax.swing.GroupLayout(pnlChartSoLuongBan);
+        pnlChartSoLuongBan.setLayout(pnlChartSoLuongBanLayout);
+        pnlChartSoLuongBanLayout.setHorizontalGroup(
+            pnlChartSoLuongBanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 214, Short.MAX_VALUE)
+        );
+        pnlChartSoLuongBanLayout.setVerticalGroup(
+            pnlChartSoLuongBanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout pnlChartKhoLayout = new javax.swing.GroupLayout(pnlChartKho);
+        pnlChartKho.setLayout(pnlChartKhoLayout);
+        pnlChartKhoLayout.setHorizontalGroup(
+            pnlChartKhoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 215, Short.MAX_VALUE)
+        );
+        pnlChartKhoLayout.setVerticalGroup(
+            pnlChartKhoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout pnlChartDoanhSoLayout = new javax.swing.GroupLayout(pnlChartDoanhSo);
+        pnlChartDoanhSo.setLayout(pnlChartDoanhSoLayout);
+        pnlChartDoanhSoLayout.setHorizontalGroup(
+            pnlChartDoanhSoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        pnlChartDoanhSoLayout.setVerticalGroup(
+            pnlChartDoanhSoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout pnlChartLayout = new javax.swing.GroupLayout(pnlChart);
+        pnlChart.setLayout(pnlChartLayout);
+        pnlChartLayout.setHorizontalGroup(
+            pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlChartLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlChartSoLuongBan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnlChartKho, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlChartDoanhSo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        pnlChartLayout.setVerticalGroup(
+            pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlChartLayout.createSequentialGroup()
+                .addGroup(pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlChartKho, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlChartSoLuongBan, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(pnlChartLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(pnlChartDoanhSo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -397,20 +617,29 @@ public class ThongKeFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblBlue)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblGreen)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblOr))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(pnlChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblBlue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblGreen)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblOr))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -423,23 +652,14 @@ public class ThongKeFrame extends javax.swing.JFrame {
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+        jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -531,6 +751,9 @@ public class ThongKeFrame extends javax.swing.JFrame {
     private javax.swing.JLabel lblOr;
     private javax.swing.JLabel lblThoat;
     private javax.swing.JPanel pnlChart;
+    private javax.swing.JPanel pnlChartDoanhSo;
+    private javax.swing.JPanel pnlChartKho;
+    private javax.swing.JPanel pnlChartSoLuongBan;
     private javax.swing.JTable tblDoanhSo;
     private javax.swing.JTable tblHDCT_TK;
     private javax.swing.JTable tblKho_TK;

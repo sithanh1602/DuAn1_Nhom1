@@ -7,6 +7,8 @@ package DuAn.com.UI;
 import CheckForm.AddID_Auto;
 import CheckForm.AddMK_Auto;
 import CheckForm.AutoPasswordEncryption;
+import CheckForm.CurrencyFormatter;
+import CheckForm.DateFormatter;
 import CheckForm.Hide_Password;
 import CheckForm.ResetForm;
 import java.awt.Cursor;
@@ -18,6 +20,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -42,6 +46,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         addMK_Auto.setTextFieldValues();
         ResetForm resetForm = new ResetForm();
         resetForm.resetComponents();
+        DateFormatter dateFormatter = new DateFormatter(this);
         loadTable_Staff();
         loadCombobox();
         tblStaff.getColumnModel().getColumn(6).setCellRenderer(new Hide_Password());
@@ -51,6 +56,10 @@ public class NhanVienForm extends javax.swing.JFrame {
                 updateFieldsFromSelectedRow();
             }
         });
+        CurrencyFormatter currencyFormatter = new CurrencyFormatter(this);
+                currencyFormatter.formatCurrencyFields();
+
+        // Thêm DocumentListener để theo dõi các thay đổi trong txtLuongMoney
     }
 
     private void updateFieldsFromSelectedRow() {
@@ -66,12 +75,13 @@ public class NhanVienForm extends javax.swing.JFrame {
             }
             txtDate.setText(tblStaff.getValueAt(row, 3).toString());
             cbochucVu.setSelectedItem(tblStaff.getValueAt(row, 4).toString());
-            txtLuong.setText(tblStaff.getValueAt(row, 5).toString());
+            txtLuong_Money.setText(tblStaff.getValueAt(row, 5).toString());
 
             // Hiển thị mật khẩu với dấu sao
             String password = tblStaff.getValueAt(row, 6).toString();
             txtMK_NV.setText("*".repeat(password.length()));
         }
+
     }
 
     private void loadCombobox() {
@@ -152,7 +162,7 @@ public class NhanVienForm extends javax.swing.JFrame {
 
         // Cập nhật các trường khác
         txtDate.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
-        txtLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
+        txtLuong_Money.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
 
         // Cập nhật mật khẩu với dấu sao (hoặc xử lý mã hóa nếu cần)
         String password = String.valueOf(model.getValueAt(selectedRow, 6));
@@ -198,7 +208,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         cbochucVu = new javax.swing.JComboBox<>();
         jPanel9 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        txtLuong = new javax.swing.JTextField();
+        txtLuong_Money = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         txtMK_NV = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
@@ -379,8 +389,6 @@ public class NhanVienForm extends javax.swing.JFrame {
         buttonGroup1.add(rdoFemale);
         rdoFemale.setText("Nữ");
 
-        cbochucVu.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
@@ -428,7 +436,7 @@ public class NhanVienForm extends javax.swing.JFrame {
 
         jLabel6.setText("Lương:");
 
-        txtLuong.setToolTipText("");
+        txtLuong_Money.setToolTipText("");
 
         jLabel7.setText("Mật khẩu:");
 
@@ -450,7 +458,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtDate)
-                    .addComponent(txtLuong)
+                    .addComponent(txtLuong_Money)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtMK_NV)
                     .addGroup(jPanel9Layout.createSequentialGroup()
@@ -464,7 +472,7 @@ public class NhanVienForm extends javax.swing.JFrame {
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtLuong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtLuong_Money, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -627,23 +635,24 @@ public class NhanVienForm extends javax.swing.JFrame {
     private boolean validateForm() {
         // Kiểm tra các trường văn bản
         if (txtID_NV.getText().trim().isEmpty() || txtNameNV.getText().trim().isEmpty()
-                || txtLuong.getText().trim().isEmpty()
+                || txtLuong_Money.getText().trim().isEmpty()
                 || txtMK_NV.getText().trim().isEmpty() || txtDate.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+         try {
+        String salaryText = txtLuong_Money.getText().trim().replace(",", "").replace(" VND", "");
+        double Salary = Double.parseDouble(salaryText);
 
-        // Kiểm tra lương
-        try {
-            Double salary = Double.parseDouble(txtLuong.getText().trim());
-            if (salary < 10000000) {
-                JOptionPane.showMessageDialog(this, "Lương phải lớn hơn 10 triệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Lương phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        // Check if salary is above the minimum threshold
+        if (Salary < 10000000) {
+            JOptionPane.showMessageDialog(this, "Lương phải lớn hơn 10 triệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Lương phải là số hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
 
         // Kiểm tra ngày
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -672,49 +681,62 @@ public class NhanVienForm extends javax.swing.JFrame {
 
     private void btnAdd_NVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdd_NVActionPerformed
         if (validateForm()) {
-            String ID = txtID_NV.getText().trim();
-            String name = txtNameNV.getText().trim();
-            String Gender = rdoMale.isSelected() ? "Nam" : "Nữ";
-            String Date = txtDate.getText().trim();
-            String Role = cbochucVu.getSelectedItem().toString(); // Lấy giá trị từ JComboBox
-            double Salary = Double.parseDouble(txtLuong.getText().trim());
-            String password = txtMK_NV.getText().trim();
+        // Initialize CurrencyFormatter if not already done
+        CurrencyFormatter currencyFormatter = new CurrencyFormatter(this);
+        currencyFormatter.resetAllCurrencyFields(); // Reset formatting
 
-            // Mã hóa mật khẩu
-            String hashedPassword = AutoPasswordEncryption.hashPassword(password);
+        String ID = txtID_NV.getText().trim();
+        String name = txtNameNV.getText().trim();
+        String Gender = rdoMale.isSelected() ? "Nam" : "Nữ";
+        String Date = txtDate.getText().trim();
+        String Role = cbochucVu.getSelectedItem().toString(); // Lấy giá trị từ JComboBox
 
-            String query = "INSERT INTO NHAN_VIEN (ID_NV, TEN_NV, GIOI_TINH, NGAY_VAO_LAM, CHUC_VU, LUONG, MAT_KHAU) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-            try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
-                pst.setString(1, ID);
-                pst.setString(2, name);
-                pst.setString(3, Gender);
-                pst.setString(4, Date);
-                pst.setString(5, Role); // Sử dụng giá trị từ JComboBox
-                pst.setDouble(6, Salary);
-                pst.setString(7, hashedPassword); // Lưu mật khẩu đã mã hóa
-
-                int result = pst.executeUpdate();
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công.");
-                    loadTable_Staff();
-                    // Làm sạch các ô nhập liệu sau khi thêm thành công
-                    txtID_NV.setText("");
-                    txtNameNV.setText("");
-                    rdoMale.setSelected(false);
-                    rdoFemale.setSelected(false);
-                    txtDate.setText("");
-                    cbochucVu.setSelectedIndex(0); // Đặt lại JComboBox về giá trị đầu tiên
-                    txtLuong.setText("");
-                    txtMK_NV.setText("");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Thêm nhân viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi khi thêm nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
+        // Parse and format salary
+        double Salary = 0.0;
+        try {
+            Salary = Double.parseDouble(txtLuong_Money.getText().trim().replace(",", "").replace(" VND", ""));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Lương không hợp lệ. Vui lòng kiểm tra lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
+        String password = txtMK_NV.getText().trim();
+        // Mã hóa mật khẩu
+        String hashedPassword = AutoPasswordEncryption.hashPassword(password);
+
+        String query = "INSERT INTO NHAN_VIEN (ID_NV, TEN_NV, GIOI_TINH, NGAY_VAO_LAM, CHUC_VU, LUONG, MAT_KHAU) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement pst = con.prepareStatement(query)) {
+
+            pst.setString(1, ID);
+            pst.setString(2, name);
+            pst.setString(3, Gender);
+            pst.setString(4, Date);
+            pst.setString(5, Role); // Sử dụng giá trị từ JComboBox
+            pst.setDouble(6, Salary);
+            pst.setString(7, hashedPassword); // Lưu mật khẩu đã mã hóa
+
+            int result = pst.executeUpdate();
+            if (result > 0) {
+                JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công.");
+                loadTable_Staff();
+                // Làm sạch các ô nhập liệu sau khi thêm thành công
+                txtID_NV.setText("");
+                txtNameNV.setText("");
+                rdoMale.setSelected(false);
+                rdoFemale.setSelected(false);
+                txtDate.setText("");
+                cbochucVu.setSelectedIndex(0); // Đặt lại JComboBox về giá trị đầu tiên
+                txtLuong_Money.setText("");
+                txtMK_NV.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this, "Thêm nhân viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     }//GEN-LAST:event_btnAdd_NVActionPerformed
 
@@ -728,75 +750,72 @@ public class NhanVienForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDateActionPerformed
 
     private void btnUpdate_NVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdate_NVActionPerformed
-       if (validateForm()) { // Kiểm tra tính hợp lệ của form
-        String ID = txtID_NV.getText().trim(); // Lấy và xóa khoảng trắng của mã nhân viên
-        String name = txtNameNV.getText().trim(); // Lấy và xóa khoảng trắng của tên nhân viên
-        String Gender = rdoMale.isSelected() ? "Nam" : "Nữ"; // Kiểm tra giới tính của nhân viên
-        String Date = txtDate.getText().trim(); // Lấy và xóa khoảng trắng của ngày vào làm
-        String Role = cbochucVu.getSelectedItem().toString(); // Lấy chức vụ từ JComboBox
-        double Salary = Double.parseDouble(txtLuong.getText().trim()); // Chuyển đổi lương từ chuỗi sang số double
-        String newPassword = txtMK_NV.getText().trim(); // Lấy mật khẩu mới từ trường nhập liệu
+        if (validateForm()) { // Kiểm tra tính hợp lệ của form
+            String ID = txtID_NV.getText().trim(); // Lấy và xóa khoảng trắng của mã nhân viên
+            String name = txtNameNV.getText().trim(); // Lấy và xóa khoảng trắng của tên nhân viên
+            String Gender = rdoMale.isSelected() ? "Nam" : "Nữ"; // Kiểm tra giới tính của nhân viên
+            String Date = txtDate.getText().trim(); // Lấy và xóa khoảng trắng của ngày vào làm
+            String Role = cbochucVu.getSelectedItem().toString(); // Lấy chức vụ từ JComboBox
+        double Salary = Double.parseDouble(txtLuong_Money.getText().trim().replace(",", "").replace(" VND", ""));
+            String newPassword = txtMK_NV.getText().trim(); // Lấy mật khẩu mới từ trường nhập liệu
 
-        // Khai báo biến để lưu mật khẩu hiện tại
-        String currentPassword = "";
-        // Câu lệnh SQL để lấy mật khẩu hiện tại từ cơ sở dữ liệu
-        String selectQuery = "SELECT MAT_KHAU FROM NHAN_VIEN WHERE ID_NV = ?";
-        try (Connection con = DriverManager.getConnection(url); 
-             PreparedStatement pst = con.prepareStatement(selectQuery)) {
-            pst.setString(1, ID); // Thiết lập mã nhân viên cho câu lệnh SQL
-            ResultSet rs = pst.executeQuery(); // Thực thi câu lệnh và nhận kết quả
-            if (rs.next()) {
-                currentPassword = rs.getString("MAT_KHAU"); // Lấy mật khẩu hiện tại từ kết quả truy vấn
+            // Khai báo biến để lưu mật khẩu hiện tại
+            String currentPassword = "";
+            // Câu lệnh SQL để lấy mật khẩu hiện tại từ cơ sở dữ liệu
+            String selectQuery = "SELECT MAT_KHAU FROM NHAN_VIEN WHERE ID_NV = ?";
+            try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(selectQuery)) {
+                pst.setString(1, ID); // Thiết lập mã nhân viên cho câu lệnh SQL
+                ResultSet rs = pst.executeQuery(); // Thực thi câu lệnh và nhận kết quả
+                if (rs.next()) {
+                    currentPassword = rs.getString("MAT_KHAU"); // Lấy mật khẩu hiện tại từ kết quả truy vấn
+                } else {
+                    JOptionPane.showMessageDialog(this, "Nhân viên không tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return; // Kết thúc phương thức nếu nhân viên không tồn tại
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi lấy mật khẩu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return; // Kết thúc phương thức nếu có lỗi trong khi truy vấn cơ sở dữ liệu
+            }
+
+            // Kiểm tra mật khẩu hiện tại đã mã hóa hay chưa
+            boolean isCurrentPasswordHashed = AutoPasswordEncryption.isHashed(currentPassword);
+
+            // Kiểm tra mật khẩu mới có hợp lệ không (không lặp ký tự và không toàn bộ là số/chữ cái)
+            boolean isPasswordValid = !isRepeatingCharacter(newPassword) && !isAllDigitsOrLetters(newPassword);
+            String passwordToUpdate;
+            if (newPassword.isEmpty() || !isPasswordValid) {
+                if (!isPasswordValid) {
+                }
+                // Nếu không có mật khẩu mới hợp lệ, giữ nguyên mật khẩu hiện tại hoặc mã hóa nếu chưa mã hóa
+                passwordToUpdate = isCurrentPasswordHashed ? currentPassword : AutoPasswordEncryption.hashPassword(currentPassword);
             } else {
-                JOptionPane.showMessageDialog(this, "Nhân viên không tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return; // Kết thúc phương thức nếu nhân viên không tồn tại
+                // Mã hóa mật khẩu mới và sử dụng để cập nhật
+                passwordToUpdate = AutoPasswordEncryption.hashPassword(newPassword);
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi lấy mật khẩu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return; // Kết thúc phương thức nếu có lỗi trong khi truy vấn cơ sở dữ liệu
-        }
 
-        // Kiểm tra mật khẩu hiện tại đã mã hóa hay chưa
-        boolean isCurrentPasswordHashed = AutoPasswordEncryption.isHashed(currentPassword);
+            // Câu lệnh SQL để cập nhật thông tin nhân viên
+            String updateQuery = "UPDATE NHAN_VIEN SET TEN_NV = ?, GIOI_TINH = ?, NGAY_VAO_LAM = ?, CHUC_VU = ?, LUONG = ?, MAT_KHAU = ? WHERE ID_NV = ?";
+            try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(updateQuery)) {
+                pst.setString(1, name); // Thiết lập tên nhân viên
+                pst.setString(2, Gender); // Thiết lập giới tính
+                pst.setString(3, Date); // Thiết lập ngày vào làm
+                pst.setString(4, Role); // Thiết lập chức vụ
+                pst.setDouble(5, Salary); // Thiết lập lương
+                pst.setString(6, passwordToUpdate); // Sử dụng mật khẩu đã mã hóa hoặc mật khẩu hiện tại
+                pst.setString(7, ID); // Thiết lập mã nhân viên
 
-        // Kiểm tra mật khẩu mới có hợp lệ không (không lặp ký tự và không toàn bộ là số/chữ cái)
-        boolean isPasswordValid = !isRepeatingCharacter(newPassword) && !isAllDigitsOrLetters(newPassword);
-        String passwordToUpdate;
-        if (newPassword.isEmpty() || !isPasswordValid) {
-            if (!isPasswordValid) {
-                JOptionPane.showMessageDialog(this, "Mật khẩu mới không hợp lệ. Sẽ không cập nhật mật khẩu.");
+                int result = pst.executeUpdate(); // Thực thi câu lệnh cập nhật
+                if (result > 0) {
+                    JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công.");
+                    loadTable_Staff(); // Tải lại bảng nhân viên để phản ánh các thay đổi
+                    clearFields(); // Làm sạch các ô nhập liệu sau khi cập nhật thành công
+                } else {
+                    JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
-            // Nếu không có mật khẩu mới hợp lệ, giữ nguyên mật khẩu hiện tại hoặc mã hóa nếu chưa mã hóa
-            passwordToUpdate = isCurrentPasswordHashed ? currentPassword : AutoPasswordEncryption.hashPassword(currentPassword);
-        } else {
-            // Mã hóa mật khẩu mới và sử dụng để cập nhật
-            passwordToUpdate = AutoPasswordEncryption.hashPassword(newPassword);
-        }
 
-        // Câu lệnh SQL để cập nhật thông tin nhân viên
-        String updateQuery = "UPDATE NHAN_VIEN SET TEN_NV = ?, GIOI_TINH = ?, NGAY_VAO_LAM = ?, CHUC_VU = ?, LUONG = ?, MAT_KHAU = ? WHERE ID_NV = ?";
-        try (Connection con = DriverManager.getConnection(url); 
-             PreparedStatement pst = con.prepareStatement(updateQuery)) {
-            pst.setString(1, name); // Thiết lập tên nhân viên
-            pst.setString(2, Gender); // Thiết lập giới tính
-            pst.setString(3, Date); // Thiết lập ngày vào làm
-            pst.setString(4, Role); // Thiết lập chức vụ
-            pst.setDouble(5, Salary); // Thiết lập lương
-            pst.setString(6, passwordToUpdate); // Sử dụng mật khẩu đã mã hóa hoặc mật khẩu hiện tại
-            pst.setString(7, ID); // Thiết lập mã nhân viên
-
-            int result = pst.executeUpdate(); // Thực thi câu lệnh cập nhật
-            if (result > 0) {
-                JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công.");
-                loadTable_Staff(); // Tải lại bảng nhân viên để phản ánh các thay đổi
-                clearFields(); // Làm sạch các ô nhập liệu sau khi cập nhật thành công
-            } else {
-                JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật nhân viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    
         }    }//GEN-LAST:event_btnUpdate_NVActionPerformed
 
 // Phương thức kiểm tra mật khẩu có phải là ký tự lặp lại không
@@ -838,7 +857,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         rdoFemale.setSelected(false);
         txtDate.setText("");
         cbochucVu.setSelectedIndex(0);
-        txtLuong.setText("");
+        txtLuong_Money.setText("");
         txtMK_NV.setText("");
     }
 
@@ -873,7 +892,7 @@ public class NhanVienForm extends javax.swing.JFrame {
                     rdoFemale.setSelected(false);
                     txtDate.setText("");
                     cbochucVu.setSelectedIndex(0); // Đặt lại JComboBox về giá trị đầu tiên
-                    txtLuong.setText("");
+                    txtLuong_Money.setText("");
                     txtMK_NV.setText("");
                 } else {
                     JOptionPane.showMessageDialog(null, "Không có nhân viên nào được xóa.");
@@ -892,7 +911,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         rdoFemale.setSelected(false);
         txtDate.setText("");
         cbochucVu.setSelectedIndex(0); // Đặt lại JComboBox về giá trị đầu tiên
-        txtLuong.setText("");
+        txtLuong_Money.setText("");
         txtMK_NV.setText("");    }//GEN-LAST:event_btnResetActionPerformed
 
     private void btnFirtsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFirtsActionPerformed
@@ -1019,7 +1038,7 @@ public class NhanVienForm extends javax.swing.JFrame {
     private javax.swing.JTable tblStaff;
     private javax.swing.JTextField txtDate;
     private javax.swing.JTextField txtID_NV;
-    private javax.swing.JTextField txtLuong;
+    private javax.swing.JTextField txtLuong_Money;
     private javax.swing.JTextField txtMK_NV;
     private javax.swing.JTextField txtNameNV;
     // End of variables declaration//GEN-END:variables

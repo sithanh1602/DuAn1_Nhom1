@@ -239,7 +239,7 @@
                                       <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="txtIDSP" min="-2" pref="123" max="-2" attributes="0"/>
-                                      <Component id="txtGiaTien" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtGiaTienMoney" alignment="0" max="32767" attributes="0"/>
                                       <Component id="txtSoLuong" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -280,7 +280,7 @@
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtGiaTien" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtGiaTienMoney" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -366,7 +366,7 @@
                     <Property name="text" type="java.lang.String" value="Gi&#xe1; ti&#x1ec1;n"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="txtGiaTien">
+                <Component class="javax.swing.JTextField" name="txtGiaTienMoney">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel6">
                   <Properties>

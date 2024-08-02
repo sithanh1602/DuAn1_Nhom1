@@ -313,21 +313,21 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtTongTien" alignment="0" pref="160" max="32767" attributes="0"/>
+                                      <Component id="txtTongTien_Money" alignment="0" pref="160" max="32767" attributes="0"/>
                                       <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtPhaiTra" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtPhaiTra_Money" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="txtKhachDua" min="-2" pref="111" max="-2" attributes="0"/>
+                                          <Component id="txtKhachDuaMoney" min="-2" pref="111" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                                           <Group type="102" alignment="0" attributes="0">
                                               <EmptySpace min="1" pref="1" max="-2" attributes="0"/>
-                                              <Component id="txtTienThua" min="-2" pref="105" max="-2" attributes="0"/>
+                                              <Component id="txtTienThua_Money" min="-2" pref="105" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                   </Group>
@@ -361,7 +361,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtTongTien" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtTongTien_Money" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -374,7 +374,7 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtPhaiTra" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtPhaiTra_Money" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -387,12 +387,12 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtKhachDua" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtKhachDuaMoney" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtTienThua" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtTienThua_Money" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -442,23 +442,23 @@
                 <Property name="text" type="java.lang.String" value="T&#x1ed5;ng ti&#x1ec1;n"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="txtTongTien">
+            <Component class="javax.swing.JTextField" name="txtTongTien_Money">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel6">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Ti&#x1ec1;n  ph&#x1ea3;i tr&#x1ea3;"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="txtPhaiTra">
+            <Component class="javax.swing.JTextField" name="txtPhaiTra_Money">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel7">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Kh&#xe1;ch &#x111;&#x1b0;a"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="txtKhachDua">
+            <Component class="javax.swing.JTextField" name="txtKhachDuaMoney">
             </Component>
-            <Component class="javax.swing.JTextField" name="txtTienThua">
+            <Component class="javax.swing.JTextField" name="txtTienThua_Money">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel8">
               <Properties>
