@@ -5,12 +5,15 @@
 package DuAn.com.UI;
 
 import CheckForm.AddID_Auto;
+import CheckForm.CurrencyFormatter;
 import CheckForm.ImageRenderer;
 import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,6 +27,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -42,6 +50,7 @@ public class SanPhamForm extends javax.swing.JFrame {
      */
     public SanPhamForm() throws ClassNotFoundException, SQLException {
         initComponents();
+        CurrencyFormatter currencyFormatter = new CurrencyFormatter(this);
         init();
         listenCBo();
         AddID_Auto addID_Auto = new AddID_Auto();
@@ -85,8 +94,8 @@ public class SanPhamForm extends javax.swing.JFrame {
         DoDuLieuLenComboBoxNcc();
 
     }
-    
-     private void setColumnWidth(TableColumn column, int width) {
+
+    private void setColumnWidth(TableColumn column, int width) {
         if (column != null) {
             column.setMinWidth(width);
             column.setMaxWidth(width);
@@ -192,7 +201,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtMalsp.setText("");
         txtMancc.setText("");
         txtSoLuong.setText("");
-        txtGiaTien.setText("");
+        txtGiaTienMoney.setText("");
         lblPic.setIcon(null);
     }
 
@@ -208,7 +217,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                 txtTenSP.setText(String.valueOf(model.getValueAt(selectedRow, 1)));
                 txtMalsp.setText(String.valueOf(model.getValueAt(selectedRow, 2)));
                 txtMancc.setText(String.valueOf(model.getValueAt(selectedRow, 3)));
-                txtGiaTien.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
+                txtGiaTienMoney.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
                 txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
                 String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
                 displayImage(imagePath);
@@ -255,9 +264,12 @@ public class SanPhamForm extends javax.swing.JFrame {
             return false;
         }
         try {
-            Integer.parseInt(txtGiaTien.getText());
+            String salaryText = txtGiaTienMoney.getText().trim().replace(",", "").replace(" VND", "");
+            double Salary = Double.parseDouble(salaryText);
+
+            // Check if salary is above the minimum threshold
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Giá tiền phải là số!");
+            JOptionPane.showMessageDialog(this, "Lương phải là số hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         if (txtSoLuong.getText().equals("")) {
@@ -283,10 +295,118 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtTenSP.setText(String.valueOf(model.getValueAt(selectedRow, 1)));
         txtMalsp.setText(String.valueOf(model.getValueAt(selectedRow, 2)));
         txtMancc.setText(String.valueOf(model.getValueAt(selectedRow, 3)));
-        txtGiaTien.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
+        txtGiaTienMoney.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
         txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
         String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
         displayImage(imagePath);
+    }
+
+    private void deleteProduct() {
+        int viTri = tblSp.getSelectedRowCount();
+        if (viTri == 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String productId = txtIDSP.getText();
+
+        // Check if the product is in any invoice
+        try {
+            ketNoiCsdl();
+            String sqlCheckExistence = "SELECT COUNT(*) FROM CHI_TIET_HOA_DON WHERE ID_SP = ?";
+            PreparedStatement stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+            stmtCheckExistence.setString(1, productId);
+
+            ResultSet rs = stmtCheckExistence.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count > 0) {
+                JOptionPane.showMessageDialog(this, "Sản phẩm đang tồn tại trong hóa đơn và không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                rs.close();
+                stmtCheckExistence.close();
+                ketNoi.close();
+                return;
+            }
+
+            // Proceed with deletion
+            String sqlDelete = "DELETE FROM SAN_PHAM WHERE ID_SP = ?";
+            PreparedStatement stmtDelete = ketNoi.prepareStatement(sqlDelete);
+            stmtDelete.setString(1, productId);
+            stmtDelete.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+            TaiDulieuVaoBang(); // Refresh the table data
+            clear(); // Clear input fields
+
+            rs.close();
+            stmtCheckExistence.close();
+            stmtDelete.close();
+            ketNoi.close();
+
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi xử lý cơ sở dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public boolean kiemTraTrungMa() throws ClassNotFoundException, SQLException {
+        ketNoiCsdl();
+        String sql = "SELECT ID_SP FROM SAN_PHAM";// có thể bắt cccd hay sdt ...
+        PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
+        ResultSet ketQua = cauLenh.executeQuery();
+        while (ketQua.next() == true) {
+            if (ketQua.getString(1).equalsIgnoreCase(txtIDSP.getText())) { // dò mã nhập vào kết quả coi có trùng ko có bắt lỗi
+                JOptionPane.showMessageDialog(this, "Mã sản phẩm đã tồn tại!");
+                return true;
+            }
+        }
+        return false;// mã sinh viên không trùng 
+    }
+
+    private void exportToExcel() {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Products");
+
+        // Tạo dòng tiêu đề
+        Row headerRow = sheet.createRow(0);
+        String[] columns = {"Mã sản phẩm", "Tên sản phẩm", "Mã loại sản phẩm", "Mã nhà cung cấp", "Giá tiền", "Số lượng tồn kho", "Images"};
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columns[i]);
+        }
+
+        // Nhập dữ liệu vào các dòng
+        DefaultTableModel model = (DefaultTableModel) tblSp.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Row row = sheet.createRow(i + 1);
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                Cell cell = row.createCell(j);
+                Object value = model.getValueAt(i, j);
+                if (value != null) {
+                    // Chuyển đổi giá trị thành chuỗi cho ô
+                    cell.setCellValue(value.toString());
+                }
+            }
+        }
+
+        // Đường dẫn đến thư mục lưu file
+        String filePath = "D:\\DuAn1_GR1\\excel\\SanPhamData.xlsx";
+
+        // Ghi dữ liệu ra file
+        try ( FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi ghi file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+
+        try {
+            workbook.close();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi đóng file Excel: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+
+        JOptionPane.showMessageDialog(this, "Xuất dữ liệu hoàn tất! File được lưu tại: " + filePath);
     }
 
     /**
@@ -315,7 +435,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtTenSP = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtGiaTien = new javax.swing.JTextField();
+        txtGiaTienMoney = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtSoLuong = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
@@ -339,6 +459,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         tblSp = new javax.swing.JTable();
         txtSearch = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        btnExcel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -458,7 +579,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                             .addComponent(jLabel6)
                             .addComponent(jLabel8)
                             .addComponent(txtIDSP, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtGiaTien)
+                            .addComponent(txtGiaTienMoney)
                             .addComponent(txtSoLuong))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
@@ -491,7 +612,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtGiaTien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtGiaTienMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -583,6 +704,7 @@ public class SanPhamForm extends javax.swing.JFrame {
                 .addGap(0, 27, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnFirts)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnPrev)
@@ -690,6 +812,13 @@ public class SanPhamForm extends javax.swing.JFrame {
 
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Search.png"))); // NOI18N
 
+        btnExcel.setText("Excel");
+        btnExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcelActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -699,7 +828,9 @@ public class SanPhamForm extends javax.swing.JFrame {
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(23, 23, 23)
                 .addComponent(jLabel7)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnExcel)
+                .addContainerGap())
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
@@ -708,9 +839,11 @@ public class SanPhamForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
+                    .addComponent(jLabel7)
+                    .addComponent(btnExcel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1))
+                .addComponent(jScrollPane1)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -855,7 +988,7 @@ public class SanPhamForm extends javax.swing.JFrame {
         txtTenSP.setText(String.valueOf(model.getValueAt(selectedRow, 1)));
         txtMalsp.setText(String.valueOf(model.getValueAt(selectedRow, 2)));
         txtMancc.setText(String.valueOf(model.getValueAt(selectedRow, 3)));
-        txtGiaTien.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
+        txtGiaTienMoney.setText(String.valueOf(model.getValueAt(selectedRow, 4)));
         txtSoLuong.setText(String.valueOf(model.getValueAt(selectedRow, 5)));
         String imagePath = tblSp.getValueAt(selectedRow, 6).toString();
         displayImage(imagePath);
@@ -907,52 +1040,122 @@ public class SanPhamForm extends javax.swing.JFrame {
 
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
         try {
-            //kiểm tra mã không trùng, kiểm tra rổnng
-            if (kiemTraRong() == true) {
+            // Kiểm tra mã không trùng, kiểm tra rỗng
+            if (kiemTraRong()) {
                 ketNoiCsdl();
-                String sql = "INSERT INTO SAN_PHAM(ID_SP,TEN_SP,ID_LSP,ID_NHA_CC,GIA,SL_TONKHO,HINH) VALUES(?, ?, ?, ?, ?,?,?)";
-                PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-                cauLenh.setString(1, txtIDSP.getText());
-                cauLenh.setString(2, txtTenSP.getText());
-                cauLenh.setString(3, txtMalsp.getText());
-                cauLenh.setString(4, txtMancc.getText());
-                cauLenh.setInt(5, Integer.parseInt(txtGiaTien.getText()));
-                cauLenh.setInt(6, Integer.parseInt(txtSoLuong.getText()));
-                cauLenh.setString(7, link);
 
-                cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
+                // Check if the product ID already exists
+                String sqlCheckExistence = "SELECT COUNT(*) FROM SAN_PHAM WHERE ID_SP = ?";
+                PreparedStatement stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+                stmtCheckExistence.setString(1, txtIDSP.getText());
+
+                ResultSet rs = stmtCheckExistence.executeQuery();
+                rs.next();
+                int count = rs.getInt(1);
+
+                if (count > 0) {
+                    // Product ID already exists
+                    JOptionPane.showMessageDialog(this, "Mã sản phẩm đã tồn tại. Vui lòng sử dụng mã khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    rs.close();
+                    stmtCheckExistence.close();
+                    ketNoi.close();
+                    return;
+                }
+
+                // Remove currency formatting from the price field
+                String formattedPrice = txtGiaTienMoney.getText().trim();
+                formattedPrice = formattedPrice.replace(",", "").replace(" VND", "");
+
+                // Insert new product
+                String sqlInsert = "INSERT INTO SAN_PHAM(ID_SP, TEN_SP, ID_LSP, ID_NHA_CC, GIA, SL_TONKHO, HINH) VALUES(?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmtInsert = ketNoi.prepareStatement(sqlInsert);
+                stmtInsert.setString(1, txtIDSP.getText());
+                stmtInsert.setString(2, txtTenSP.getText());
+                stmtInsert.setString(3, txtMalsp.getText());
+                stmtInsert.setString(4, txtMancc.getText());
+                stmtInsert.setInt(5, Integer.parseInt(formattedPrice));
+                stmtInsert.setInt(6, Integer.parseInt(txtSoLuong.getText()));
+                stmtInsert.setString(7, link);
+
+                int rowsAffected = stmtInsert.executeUpdate(); // Execute the update
+                if (rowsAffected > 0) {
+                    // Show success message
+                    JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                // Refresh data
                 TaiDulieuVaoBang();
+                stmtInsert.close();
+                stmtCheckExistence.close();
                 ketNoi.close();
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void btnSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuaActionPerformed
-        try {
+        try {       
             ketNoiCsdl();
-            String sql = "UPDATE SAN_PHAM SET TEN_SP=?, ID_LSP=?, ID_NHA_CC=?, GIA=?, SL_TONKHO=?, HINH=? WHERE ID_SP=?";
-            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-            cauLenh.setString(1, txtTenSP.getText());
-            cauLenh.setString(2, txtMalsp.getText());
-            cauLenh.setString(3, txtMancc.getText());
-            cauLenh.setInt(4, Integer.parseInt(txtGiaTien.getText()));
-            cauLenh.setInt(5, Integer.parseInt(txtSoLuong.getText()));
-            cauLenh.setString(6, link);
-            cauLenh.setString(7, txtIDSP.getText()); // Tham số ID_SP là tham số cuối cùng
 
-            cauLenh.executeUpdate(); // Có thay đổi thì dùng executeUpdate (thêm, sửa, xoá)
+            // Remove currency formatting from the price field
+            String formattedPrice = txtGiaTienMoney.getText().trim();
+            formattedPrice = formattedPrice.replace(",", "").replace(" VND", "");
+
+            // Check if the product ID exists
+            String sqlCheckExistence = "SELECT COUNT(*) FROM SAN_PHAM WHERE ID_SP = ?";
+            PreparedStatement stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+            stmtCheckExistence.setString(1, txtIDSP.getText());
+
+            ResultSet rs = stmtCheckExistence.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count == 0) {
+                // Product ID does not exist
+                JOptionPane.showMessageDialog(this, "Mã sản phẩm không tồn tại. Vui lòng kiểm tra lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                rs.close();
+                stmtCheckExistence.close();
+                ketNoi.close();
+                return;
+            }
+
+            // Update existing product
+            String sqlUpdate = "UPDATE SAN_PHAM SET TEN_SP=?, ID_LSP=?, ID_NHA_CC=?, GIA=?, SL_TONKHO=?, HINH=? WHERE ID_SP=?";
+            PreparedStatement stmtUpdate = ketNoi.prepareStatement(sqlUpdate);
+            stmtUpdate.setString(1, txtTenSP.getText());
+            stmtUpdate.setString(2, txtMalsp.getText());
+            stmtUpdate.setString(3, txtMancc.getText());
+            stmtUpdate.setInt(4, Integer.parseInt(formattedPrice));
+            stmtUpdate.setInt(5, Integer.parseInt(txtSoLuong.getText()));
+            stmtUpdate.setString(6, link);
+            stmtUpdate.setString(7, txtIDSP.getText());
+
+            int rowsAffected = stmtUpdate.executeUpdate(); // Execute the update
+            if (rowsAffected > 0) {
+                // Show success message
+                JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // No rows affected, indicating an issue
+                JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Refresh data
             TaiDulieuVaoBang();
+            stmtUpdate.close();
+            stmtCheckExistence.close();
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-
     }//GEN-LAST:event_btnSuaActionPerformed
 
     private void txtManccKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtManccKeyReleased
@@ -964,22 +1167,23 @@ public class SanPhamForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtManccKeyPressed
 
     private void btnXoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaActionPerformed
-        int ViTri = tblSp.getSelectedRowCount();
-        try {
-            ketNoiCsdl();
-            String sql = "DELETE SAN_PHAM WHERE ID_SP=?";
-            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
-            cauLenh.setString(1, txtIDSP.getText());
-            cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
-            TaiDulieuVaoBang();
-            JOptionPane.showMessageDialog(this, "Xoá thành công!");
-            clear();
-            ketNoi.close();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        int ViTri = tblSp.getSelectedRowCount();
+//        try {
+//            ketNoiCsdl();
+//            String sql = "DELETE SAN_PHAM WHERE ID_SP=?";
+//            PreparedStatement cauLenh = ketNoi.prepareStatement(sql);
+//            cauLenh.setString(1, txtIDSP.getText());
+//            cauLenh.executeUpdate();// có thay đổi thì dùng excuteUpdate (thêm sửa xoá)
+//            TaiDulieuVaoBang();
+//            JOptionPane.showMessageDialog(this, "Xoá thành công!");
+//            clear();
+//            ketNoi.close();
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        deleteProduct();
     }//GEN-LAST:event_btnXoaActionPerformed
 
     private void btnMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoiActionPerformed
@@ -1017,6 +1221,10 @@ public class SanPhamForm extends javax.swing.JFrame {
         tblSp.setRowSelectionInterval(ViTri, ViTri);
         fillBtn();
     }//GEN-LAST:event_btnLastActionPerformed
+
+    private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
+        exportToExcel();
+    }//GEN-LAST:event_btnExcelActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1060,6 +1268,7 @@ public class SanPhamForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExcel;
     private javax.swing.JButton btnFirts;
     private javax.swing.JButton btnLast;
     private javax.swing.JButton btnMoi;
@@ -1094,7 +1303,7 @@ public class SanPhamForm extends javax.swing.JFrame {
     private javax.swing.JLabel lblPic;
     private javax.swing.JLabel lblThoat;
     private javax.swing.JTable tblSp;
-    private javax.swing.JTextField txtGiaTien;
+    private javax.swing.JTextField txtGiaTienMoney;
     private javax.swing.JTextField txtIDSP;
     private javax.swing.JTextField txtMalsp;
     private javax.swing.JTextField txtMancc;

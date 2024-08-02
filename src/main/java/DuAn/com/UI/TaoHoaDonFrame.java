@@ -4,6 +4,8 @@
  */
 package DuAn.com.UI;
 
+import CheckForm.CurrencyFormatter;
+import CheckForm.CurrencyRenderer;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,8 +16,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
@@ -35,6 +40,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
     DefaultTableModel model2 = new DefaultTableModel();
     DefaultTableModel model3 = new DefaultTableModel();
     Connection ketNoi;
+
     String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY3;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
     /**
@@ -45,6 +51,9 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         init();
         model = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
         model1 = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
+        model2 = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
+        model3 = new NonEditableTableModel(); // Sử dụng mô hình không thể chỉnh sửa
+        CurrencyFormatter currencyFormatter = new CurrencyFormatter(this);
         // Khởi tạo model cho JTable
         tenCotBang1();
         tenCotBang2();
@@ -119,7 +128,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
             }
         });
 
-        txtKhachDua.getDocument().addDocumentListener(new DocumentListener() {
+        txtKhachDuaMoney.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 calculateTienThua();
             }
@@ -146,12 +155,22 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
 
     private void calculateTienThua() {
         try {
-            int tongTien = Integer.parseInt(txtTongTien.getText());
-            int tienKhachDua = Integer.parseInt(txtKhachDua.getText());
+            // Ensure txtTongTien_Money has valid text and is parsed correctly
+            String tongTienText = txtTongTien_Money.getText().replaceAll("[^\\d]", "");
+            int tongTien = tongTienText.isEmpty() ? 0 : Integer.parseInt(tongTienText);
+
+            // Ensure txtKhachDuaMoney has valid text and is parsed correctly
+            String khachDuaText = txtKhachDuaMoney.getText().replaceAll("[^\\d]", "");
+            int tienKhachDua = khachDuaText.isEmpty() ? 0 : Integer.parseInt(khachDuaText);
+
+            // Calculate change
             int tienThua = tienKhachDua - tongTien;
-            txtTienThua.setText(String.valueOf(tienThua));
+
+            // Set result to txtTienThua_Money
+            txtTienThua_Money.setText(String.valueOf(tienThua));
         } catch (NumberFormatException e) {
-            txtTienThua.setText("0"); // Đặt về 0 nếu không phải là số
+            // Handle unexpected formatting issues
+            txtTienThua_Money.setText("0"); // Default to 0 if there is an issue
         }
     }
 
@@ -204,90 +223,208 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         }
     }
 
-    private void createInvoice() {
-        try {
-            // Collect information from input fields
-            String tenKH = txtTenKH.getText();
-            String sdt = txtSdt.getText();
-            String diaChi = txtDiaChi.getText();
-            int tongTien = Integer.parseInt(txtTongTien.getText());
-            int tienKhach = Integer.parseInt(txtKhachDua.getText());
-            int tienThua = Integer.parseInt(txtTienThua.getText());
-            String ghiChu = txtGhiChu.getText();
 
-            // Generate invoice ID
-            String idHoaDon = generateInvoiceId();
-            String idNV = "NV01"; // Example, replace with actual employee ID
+private void createInvoice() {
+    Connection ketNoi = null;
+    PreparedStatement stmtInsertHoaDon = null;
+    PreparedStatement stmtInsertChiTiet = null;
+    PreparedStatement stmtUpdateStock = null;
+    PreparedStatement stmtCheckExistence = null;
 
-            // Connect to the database
-            Connection ketNoi = DriverManager.getConnection(
-                    "jdbc:sqlserver://localhost:1433;databaseName=DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true",
-                    "sa", "123456");
+    try {
+        // Collect information from input fields
+        String tenKH = txtTenKH.getText();
+        String sdt = txtSdt.getText();
+        String diaChi = txtDiaChi.getText();
 
-            // Get customer ID
-            String idKH = getCustomerIdByName(tenKH, ketNoi);
-            if (idKH == null) {
-                JOptionPane.showMessageDialog(this, "Khách hàng không tồn tại.");
-                return;
+        // Remove currency formatting before parsing
+        String tongTienString = removeCurrencyFormatting(txtTongTien_Money.getText());
+        String tienKhachString = removeCurrencyFormatting(txtKhachDuaMoney.getText());
+        String tienThuaString = removeCurrencyFormatting(txtTienThua_Money.getText());
+
+        // Handle possible empty strings or parse exceptions
+        int tongTien = parseInteger(tongTienString);
+        int tienKhach = parseInteger(tienKhachString);
+        int tienThua = parseInteger(tienThuaString);
+
+        // Validation checks
+        if (tienKhach < tongTien) {
+            JOptionPane.showMessageDialog(this, "Tiền khách đưa phải lớn hơn hoặc bằng số tiền phải trả.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (tienThua < 0) {
+            JOptionPane.showMessageDialog(this, "Tiền thừa không được âm.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (tongTien == 0 && model1.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Tổng tiền không được bằng 0 và phải có ít nhất một sản phẩm.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String ghiChu = txtGhiChu.getText();
+
+        // Get payment method
+        String paymentMethod = (String) cboThanhToan.getSelectedItem();
+        if (paymentMethod == null || paymentMethod.trim().isEmpty() || paymentMethod.equals("Phương thức thanh toán")) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn phương thức thanh toán.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Get delivery status
+        String status = rdoGiaoHang.isSelected() ? "Đã thanh toán, Đang giao hàng" : "Đã thanh toán";
+
+        // Generate invoice ID
+        String idHoaDon = generateInvoiceId();
+        String idNV = "NV01"; // Example, replace with actual employee ID
+
+        // Connect to the database
+        ketNoi = DriverManager.getConnection(
+                "jdbc:sqlserver://localhost:1433;databaseName=DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true",
+                "sa", "123456");
+        ketNoi.setAutoCommit(false); // Start transaction
+
+        // Get customer ID
+        String idKH = getCustomerIdByName(tenKH, ketNoi);
+        if (idKH == null) {
+            JOptionPane.showMessageDialog(this, "Khách hàng không tồn tại.");
+            return;
+        }
+
+        // Insert invoice
+        String sqlInsertHoaDon = "INSERT INTO HOA_DON (ID_HOA_DON, ID_NV, ID_KH, NGAY_HOA_DON, TONG_TIEN, TIEN_KHACH_DUA, TIEN_THUA, GHICHU, TRANG_THAI) "
+                + "VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?, ?)";
+        stmtInsertHoaDon = ketNoi.prepareStatement(sqlInsertHoaDon);
+        stmtInsertHoaDon.setString(1, idHoaDon);
+        stmtInsertHoaDon.setString(2, idNV);
+        stmtInsertHoaDon.setString(3, idKH);
+        stmtInsertHoaDon.setInt(4, tongTien);
+        stmtInsertHoaDon.setInt(5, tienKhach);
+        stmtInsertHoaDon.setInt(6, tienThua);
+        stmtInsertHoaDon.setString(7, ghiChu);
+        stmtInsertHoaDon.setString(8, status);
+        stmtInsertHoaDon.executeUpdate();
+
+        // Check if invoice detail already exists
+        String sqlCheckExistence = "SELECT COUNT(*) FROM CHI_TIET_HOA_DON WHERE ID_HOA_DON = ? AND ID_SP = ?";
+        stmtCheckExistence = ketNoi.prepareStatement(sqlCheckExistence);
+
+        // Insert invoice details
+        String sqlInsertChiTiet = "INSERT INTO CHI_TIET_HOA_DON (ID_HOA_DON, ID_SP, SO_LUONG, DON_GIA, THANH_TIEN) "
+                + "VALUES (?, ?, ?, ?, ?)";
+        stmtInsertChiTiet = ketNoi.prepareStatement(sqlInsertChiTiet);
+
+        // Update stock for each product
+        String sqlUpdateStock = "UPDATE SAN_PHAM SET SL_TONKHO = SL_TONKHO - ? WHERE ID_SP = ?";
+        stmtUpdateStock = ketNoi.prepareStatement(sqlUpdateStock);
+
+        for (int i = 0; i < model1.getRowCount(); i++) {
+            String maSP = (String) model1.getValueAt(i, 1);
+            int soLuong = (Integer) model1.getValueAt(i, 3);
+            int donGia = (Integer) model1.getValueAt(i, 4);
+            int thanhTien = (Integer) model1.getValueAt(i, 5);
+
+            // Check if detail already exists
+            stmtCheckExistence.setString(1, idHoaDon);
+            stmtCheckExistence.setString(2, maSP);
+            ResultSet rs = stmtCheckExistence.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                // If exists, you might choose to update instead of insert
+                // Skip insertion or handle update logic here
+                continue;
             }
-
-            // Insert invoice
-            String sqlInsertHoaDon = "INSERT INTO HOA_DON (ID_HOA_DON, ID_NV, ID_KH, NGAY_HOA_DON, TONG_TIEN, TIEN_KHACH_DUA, TIEN_THUA, GHICHU) "
-                    + "VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?)";
-            PreparedStatement stmtInsertHoaDon = ketNoi.prepareStatement(sqlInsertHoaDon);
-            stmtInsertHoaDon.setString(1, idHoaDon);
-            stmtInsertHoaDon.setString(2, idNV);
-            stmtInsertHoaDon.setString(3, idKH);
-            stmtInsertHoaDon.setInt(4, tongTien);
-            stmtInsertHoaDon.setInt(5, tienKhach);
-            stmtInsertHoaDon.setInt(6, tienThua);
-            stmtInsertHoaDon.setString(7, ghiChu);
-            stmtInsertHoaDon.executeUpdate();
 
             // Insert invoice details
-            String sqlInsertChiTiet = "INSERT INTO CHI_TIET_HOA_DON (ID_HOA_DON, ID_SP, SO_LUONG, DON_GIA, THANH_TIEN) "
-                    + "VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement stmtInsertChiTiet = ketNoi.prepareStatement(sqlInsertChiTiet);
+            stmtInsertChiTiet.setString(1, idHoaDon);
+            stmtInsertChiTiet.setString(2, maSP);
+            stmtInsertChiTiet.setInt(3, soLuong);
+            stmtInsertChiTiet.setInt(4, donGia);
+            stmtInsertChiTiet.setInt(5, thanhTien);
+            stmtInsertChiTiet.addBatch();
 
-            for (int i = 0; i < model1.getRowCount(); i++) {
-                String maSP = (String) model1.getValueAt(i, 1);
-                int soLuong = (Integer) model1.getValueAt(i, 3);
-                int donGia = (Integer) model1.getValueAt(i, 4);
-                int thanhTien = (Integer) model1.getValueAt(i, 5);
+            // Update stock
+            stmtUpdateStock.setInt(1, soLuong);
+            stmtUpdateStock.setString(2, maSP);
+            stmtUpdateStock.addBatch();
+        }
 
-                stmtInsertChiTiet.setString(1, idHoaDon);
-                stmtInsertChiTiet.setString(2, maSP);
-                stmtInsertChiTiet.setInt(3, soLuong);
-                stmtInsertChiTiet.setInt(4, donGia);
-                stmtInsertChiTiet.setInt(5, thanhTien);
-                stmtInsertChiTiet.addBatch();
+        stmtInsertChiTiet.executeBatch();
+        stmtUpdateStock.executeBatch();
+
+        // Commit transaction
+        ketNoi.commit();
+
+        // Update invoice list
+        updateInvoiceList();
+
+        // Clear tblGh after saving
+        model1.setRowCount(0);
+        calculateTotalAmount();
+
+        // Show success message
+        JOptionPane.showMessageDialog(this, "Hóa đơn đã được tạo thành công.");
+        txtTienThua_Money.setText("0");
+        txtKhachDuaMoney.setText("0");
+        txtTongTien_Money.setText("0");
+    } catch (SQLException ex) {
+        // Rollback transaction if error occurs
+        if (ketNoi != null) {
+            try {
+                ketNoi.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
             }
-            stmtInsertChiTiet.executeBatch();
-
-            // Update invoice list
-            updateInvoiceList();
-
-            // Clear tblGh after saving
-            model1.setRowCount(0);
-            calculateTotalAmount();
-
-            // Close connections
-            stmtInsertHoaDon.close();
-            stmtInsertChiTiet.close();
-            ketNoi.close();
-
+        }
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu.");
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số.");
+    } finally {
+        // Close connections
+        try {
+            if (stmtInsertHoaDon != null) {
+                stmtInsertHoaDon.close();
+            }
+            if (stmtInsertChiTiet != null) {
+                stmtInsertChiTiet.close();
+            }
+            if (stmtUpdateStock != null) {
+                stmtUpdateStock.close();
+            }
+            if (stmtCheckExistence != null) {
+                stmtCheckExistence.close();
+            }
+            if (ketNoi != null) {
+                ketNoi.close();
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu.");
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số.");
         }
-        clearProductTable();
+    }
+    clearProductTable();
+}
+
+    private String removeCurrencyFormatting(String formattedCurrency) {
+        if (formattedCurrency == null || formattedCurrency.isEmpty()) {
+            return "0";
+        }
+        // Remove commas, periods, and "VND"
+        return formattedCurrency.replaceAll("[^\\d]", "");
+    }
+
+    private int parseInteger(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            // Handle invalid input gracefully
+            return 0;
+        }
     }
 
     private void clearProductTable() {
         model1.setRowCount(0);
-        txtTongTien.setText("0");
+        txtTongTien_Money.setText("0");
         calculateTotalAmount();
     }
 
@@ -315,8 +452,8 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                     "jdbc:sqlserver://localhost:1433;databaseName=DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true",
                     "sa", "123456");
 
-            // Update SQL query to match the new schema
-            String sqlSelectHoaDon = "SELECT h.ID_HOA_DON, nv.TEN_NV, kh.TEN_KH, h.NGAY_HOA_DON "
+            // Update SQL query to include TRANG_THAI
+            String sqlSelectHoaDon = "SELECT h.ID_HOA_DON, nv.TEN_NV, kh.TEN_KH, h.NGAY_HOA_DON, h.TRANG_THAI "
                     + "FROM HOA_DON h "
                     + "JOIN NHAN_VIEN nv ON h.ID_NV = nv.ID_NV "
                     + "JOIN KHACH_HANG kh ON h.ID_KH = kh.ID_KH";
@@ -330,7 +467,8 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                 String tenNV = rs.getString("TEN_NV");
                 String tenKH = rs.getString("TEN_KH");
                 Date ngayHoaDon = rs.getDate("NGAY_HOA_DON");
-                model2.addRow(new Object[]{stt++, idHoaDon, tenNV, tenKH, "Chưa thanh toán", ngayHoaDon});
+                String trangThai = rs.getString("TRANG_THAI"); // Retrieve TRANG_THAI from the result set
+                model2.addRow(new Object[]{stt++, idHoaDon, tenNV, tenKH, trangThai, ngayHoaDon});
             }
 
             rs.close();
@@ -344,12 +482,16 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
 
     void init() {
         setLocationRelativeTo(null);
-        lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {});
-        lblBlue.setCursor(new Cursor(Cursor.HAND_CURSOR) {});
-        lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {});
-        lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {});
-        txtTongTien.setEnabled(false);
-        txtPhaiTra.setEnabled(false);
+        lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        lblBlue.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        lblGreen.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        lblThoat.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        txtTongTien_Money.setEnabled(false);
+        txtPhaiTra_Money.setEnabled(false);
         btnXoa.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -406,6 +548,15 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         model2.addColumn("Trạng thái");
         model2.addColumn("Ngày tạo");
         tblHoaDon.setModel(model2);
+
+        // Set column widths
+        TableColumnModel columnModel = tblHoaDon.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(50); // Set width for "STT" column
+        columnModel.getColumn(1).setPreferredWidth(100); // Set width for "Mã hóa đơn" column
+        columnModel.getColumn(2).setPreferredWidth(150); // Set width for "Tên NV" column
+        columnModel.getColumn(3).setPreferredWidth(150); // Set width for "Tên KH" column
+        columnModel.getColumn(4).setPreferredWidth(100); // Set width for "Trạng thái" column
+        columnModel.getColumn(5).setPreferredWidth(100); // Set width for "Ngày tạo" column
     }
 
     public void tenCotBangHoaDonCT() {
@@ -422,8 +573,8 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
             int thanhTien = (Integer) model1.getValueAt(i, 5);
             totalAmount += thanhTien;
         }
-        txtTongTien.setText(String.valueOf(totalAmount));
-        txtPhaiTra.setText(String.valueOf(totalAmount));
+        txtTongTien_Money.setText(String.valueOf(totalAmount));
+        txtPhaiTra_Money.setText(String.valueOf(totalAmount));
     }
 
     private Map<String, String> getTenNhanVienFromMaNhanVien(String maNV) {
@@ -434,13 +585,13 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
 
         try (
                 // Kết nối đến cơ sở dữ liệu
-                Connection con = DriverManager.getConnection(url); // Chuẩn bị câu truy vấn
-                 PreparedStatement pst = con.prepareStatement(query);) {
+                 Connection con = DriverManager.getConnection(url); // Chuẩn bị câu truy vấn
+                  PreparedStatement pst = con.prepareStatement(query);) {
             // Đặt giá trị cho tham số trong câu truy vấn
             pst.setString(1, maNV);
 
             // Thực thi truy vấn
-            try (ResultSet rs = pst.executeQuery()) {
+            try ( ResultSet rs = pst.executeQuery()) {
                 // Nếu có kết quả trả về
                 if (rs.next()) {
                     khachHangDetails.put("tenNV", rs.getString("TEN_KH"));
@@ -484,8 +635,6 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
             return false; // Không cho phép chỉnh sửa ô
         }
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -501,6 +650,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblSp = new javax.swing.JTable();
+        btnReset = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblGh = new javax.swing.JTable();
@@ -517,17 +667,18 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         txtDiaChi = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
-        txtTongTien = new javax.swing.JTextField();
+        txtTongTien_Money = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        txtPhaiTra = new javax.swing.JTextField();
+        txtPhaiTra_Money = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        txtKhachDua = new javax.swing.JTextField();
-        txtTienThua = new javax.swing.JTextField();
+        txtKhachDuaMoney = new javax.swing.JTextField();
+        txtTienThua_Money = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         btnTaoHD = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtGhiChu = new javax.swing.JTextArea();
         cboThanhToan = new javax.swing.JComboBox<>();
+        rdoGiaoHang = new javax.swing.JRadioButton();
         jPanel6 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tblHdct = new javax.swing.JTable();
@@ -539,10 +690,10 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Bill.png"))); // NOI18N
         jLabel1.setText("Thanh toán");
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Danh sách sản phẩm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
-        jPanel5.setLayout(new java.awt.BorderLayout());
 
         tblSp.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -557,7 +708,28 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(tblSp);
 
-        jPanel5.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+        btnReset.setText("Reset");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnReset)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnReset)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Danh sách đã chọn", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
 
@@ -580,8 +752,10 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnXoa)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(btnXoa)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane3)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -638,7 +812,9 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         txtGhiChu.setBorder(javax.swing.BorderFactory.createTitledBorder("Ghi chú"));
         jScrollPane4.setViewportView(txtGhiChu);
 
-        cboThanhToan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboThanhToan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Phương thức thanh toán", "Tiền mặt", "Chuyển Khoản" }));
+
+        rdoGiaoHang.setText("Giao hàng");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -662,27 +838,28 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jLabel5)
-                                .addComponent(txtTongTien, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                                .addComponent(txtTongTien_Money, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
                                 .addComponent(jLabel6)
-                                .addComponent(txtPhaiTra))
+                                .addComponent(txtPhaiTra_Money))
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel7)
-                                    .addComponent(txtKhachDua, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(txtKhachDuaMoney, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel8)
                                     .addGroup(jPanel4Layout.createSequentialGroup()
                                         .addGap(1, 1, 1)
-                                        .addComponent(txtTienThua, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                        .addComponent(txtTienThua_Money, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnTaoHD, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cboThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                            .addComponent(cboThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(rdoGiaoHang))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(60, 60, 60))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -696,7 +873,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtTongTien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtTongTien_Money, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
@@ -706,7 +883,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtPhaiTra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtPhaiTra_Money, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
@@ -716,11 +893,11 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtKhachDua, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtKhachDuaMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtTienThua, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtTienThua_Money, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -728,7 +905,9 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(cboThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(13, 13, 13)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(rdoGiaoHang)
+                        .addGap(8, 8, 8)
                         .addComponent(btnTaoHD)))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
@@ -791,21 +970,17 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 497, Short.MAX_VALUE))
-                            .addContainerGap()))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(lblBlue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblGreen)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblOr)
-                        .addContainerGap())))
+                        .addComponent(lblOr))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblThoat)
@@ -831,7 +1006,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblThoat)
                 .addContainerGap())
@@ -847,7 +1022,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 12, Short.MAX_VALUE))
         );
 
         pack();
@@ -877,6 +1052,16 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
         dispose();
         new HomeFrame().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
+
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+        try {
+            TaiDulieuVaoBang();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TaoHoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(TaoHoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnResetActionPerformed
 
     /**
      * @param args the command line arguments
@@ -921,6 +1106,7 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnReset;
     private javax.swing.JButton btnTaoHD;
     private javax.swing.JButton btnXoa;
     private javax.swing.JComboBox<String> cboThanhToan;
@@ -948,17 +1134,18 @@ public class TaoHoaDonFrame extends javax.swing.JFrame {
     private javax.swing.JLabel lblGreen;
     private javax.swing.JLabel lblOr;
     private javax.swing.JLabel lblThoat;
+    private javax.swing.JRadioButton rdoGiaoHang;
     private javax.swing.JTable tblGh;
     private javax.swing.JTable tblHdct;
     private javax.swing.JTable tblHoaDon;
     private javax.swing.JTable tblSp;
     private javax.swing.JTextField txtDiaChi;
     private javax.swing.JTextArea txtGhiChu;
-    private javax.swing.JTextField txtKhachDua;
-    private javax.swing.JTextField txtPhaiTra;
+    private javax.swing.JTextField txtKhachDuaMoney;
+    private javax.swing.JTextField txtPhaiTra_Money;
     private javax.swing.JTextField txtSdt;
     private javax.swing.JTextField txtTenKH;
-    private javax.swing.JTextField txtTienThua;
-    private javax.swing.JTextField txtTongTien;
+    private javax.swing.JTextField txtTienThua_Money;
+    private javax.swing.JTextField txtTongTien_Money;
     // End of variables declaration//GEN-END:variables
 }

@@ -371,15 +371,15 @@
                                   <Component id="txtID_NV" max="32767" attributes="0"/>
                                   <Component id="jLabel3" alignment="0" max="32767" attributes="0"/>
                                   <Component id="txtNameNV" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="txtChucVu" max="32767" attributes="0"/>
                                   <Component id="jLabel4" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jLabel5" alignment="0" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="rdoMale" min="-2" pref="132" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="rdoFemale" min="-2" pref="98" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="14" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="jLabel5" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="cbochucVu" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -398,9 +398,9 @@
                               <Component id="txtNameNV" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                               <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtChucVu" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="cbochucVu" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -435,11 +435,6 @@
                         <Property name="text" type="java.lang.String" value="Ch&#x1ee9;c v&#x1ee5;"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="txtChucVu">
-                      <Properties>
-                        <Property name="toolTipText" type="java.lang.String" value=""/>
-                      </Properties>
-                    </Component>
                     <Component class="javax.swing.JLabel" name="jLabel5">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Gi&#x1edb;i t&#xed;nh:"/>
@@ -464,6 +459,16 @@
                         <Property name="text" type="java.lang.String" value="N&#x1eef;"/>
                       </Properties>
                     </Component>
+                    <Component class="javax.swing.JComboBox" name="cbochucVu">
+                      <Properties>
+                        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                          <StringArray count="0"/>
+                        </Property>
+                      </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+                      </AuxValues>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel9">
@@ -475,7 +480,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="txtDate" max="32767" attributes="0"/>
-                                  <Component id="txtLuong" max="32767" attributes="0"/>
+                                  <Component id="txtLuong_Money" max="32767" attributes="0"/>
                                   <Component id="jLabel6" max="32767" attributes="0"/>
                                   <Component id="txtMK_NV" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
@@ -493,7 +498,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtLuong" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtLuong_Money" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -513,7 +518,7 @@
                         <Property name="text" type="java.lang.String" value="L&#x1b0;&#x1a1;ng:"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="txtLuong">
+                    <Component class="javax.swing.JTextField" name="txtLuong_Money">
                       <Properties>
                         <Property name="toolTipText" type="java.lang.String" value=""/>
                       </Properties>

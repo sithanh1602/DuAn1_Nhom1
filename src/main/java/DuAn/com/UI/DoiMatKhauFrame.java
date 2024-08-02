@@ -4,6 +4,7 @@
  */
 package DuAn.com.UI;
 
+import CheckForm.AutoPasswordEncryption;
 import java.awt.Cursor;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
  * @author NITRO 5
  */
 public class DoiMatKhauFrame extends javax.swing.JFrame {
+
     Connection ketNoi;
 
     /**
@@ -28,7 +29,7 @@ public class DoiMatKhauFrame extends javax.swing.JFrame {
     public DoiMatKhauFrame() {
         initComponents();
         init();
-        
+
     }
 
     void init() {
@@ -43,8 +44,6 @@ public class DoiMatKhauFrame extends javax.swing.JFrame {
         String pass = "123456";
         ketNoi = DriverManager.getConnection(url, user, pass);
     }
-
-   
 
     private boolean checkUpdatePassword() {
         boolean isValid = true;
@@ -72,9 +71,10 @@ public class DoiMatKhauFrame extends javax.swing.JFrame {
         } else if (!txtnhaplaipass.getText().equals(txtnewpass.getText())) {
             JOptionPane.showMessageDialog(this, "Xác nhận mật khẩu không khớp!");
             isValid = false;
-        } 
+        }
         return isValid;
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -189,67 +189,73 @@ public class DoiMatKhauFrame extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new LoginFrame().setVisible(true);
+        new HomeFrame().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void btndmkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btndmkActionPerformed
 
         if (checkUpdatePassword()) {
             String username = txtMaNV.getText().trim();
-            String oldPassword = txtPassword.getText();
-            String newPassword = txtnewpass.getText();
+            String oldPassword = new String(txtPassword.getPassword()); // Sử dụng String cho mật khẩu
+            String newPassword = new String(txtnewpass.getPassword());
 
             try {
-                try {
-                    ketNoiCsdl();
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(DoiMatKhauFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                ketNoiCsdl(); // Kết nối cơ sở dữ liệu
 
                 // Step 1: Check if the old password matches the one in the database
                 String sqlCheck = "SELECT MAT_KHAU FROM NHAN_VIEN WHERE ID_NV = ?";
-                PreparedStatement statementCheck = ketNoi.prepareStatement(sqlCheck);
-                statementCheck.setString(1, username);
-                ResultSet rs = statementCheck.executeQuery();
+                try (PreparedStatement statementCheck = ketNoi.prepareStatement(sqlCheck)) {
+                    statementCheck.setString(1, username);
+                    ResultSet rs = statementCheck.executeQuery();
 
-                if (rs.next()) {
-                    String currentPassword = rs.getString("MAT_KHAU");
+                    if (rs.next()) {
+                        String currentPasswordHash = rs.getString("MAT_KHAU");
 
-                    if (currentPassword.equals(oldPassword)) {
-                        // Step 2: Update the password
-                        String sqlUpdate = "UPDATE NHAN_VIEN SET MAT_KHAU = ? WHERE ID_NV = ?";
-                        PreparedStatement statementUpdate = ketNoi.prepareStatement(sqlUpdate);
-                        statementUpdate.setString(1, newPassword);
-                        statementUpdate.setString(2, username);
+                        // Kiểm tra mật khẩu cũ
+                        if (AutoPasswordEncryption.checkPassword(oldPassword, currentPasswordHash)) {
+                            // Step 2: Update the password
+                            String newPasswordHash = AutoPasswordEncryption.hashPassword(newPassword);
+                            String sqlUpdate = "UPDATE NHAN_VIEN SET MAT_KHAU = ? WHERE ID_NV = ?";
+                            try (PreparedStatement statementUpdate = ketNoi.prepareStatement(sqlUpdate)) {
+                                statementUpdate.setString(1, newPasswordHash);
+                                statementUpdate.setString(2, username);
 
-                        int rowsUpdated = statementUpdate.executeUpdate();
-                        if (rowsUpdated > 0) {
-                            JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công.");
-                            txtMaNV.setText("");
-                            txtPassword.setText("");
-                            txtnewpass.setText("");
-                            txtnhaplaipass.setText("");
+                                int rowsUpdated = statementUpdate.executeUpdate();
+                                if (rowsUpdated > 0) {
+                                    JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công.");
+                                    txtMaNV.setText("");
+                                    txtPassword.setText("");
+                                    txtnewpass.setText("");
+                                    txtnhaplaipass.setText("");
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "Đổi mật khẩu thất bại.");
+                                }
+                            }
                         } else {
-                            JOptionPane.showMessageDialog(this, "Đổi mật khẩu thất bại.");
+                            JOptionPane.showMessageDialog(this, "Mật khẩu cũ không đúng.");
                         }
                     } else {
-                        JOptionPane.showMessageDialog(this, "Mật khẩu cũ không đúng.");
+                        JOptionPane.showMessageDialog(this, "Tên đăng nhập không tồn tại.");
                     }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Tên đăng nhập không tồn tại.");
-                }
 
-                // Close the ResultSet and PreparedStatement
-                rs.close();
-                statementCheck.close();
-                ketNoi.close();
+                    rs.close();
+                }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                Logger.getLogger(DoiMatKhauFrame.class.getName()).log(Level.SEVERE, null, e);
+            } finally {
+                try {
+                    if (ketNoi != null && !ketNoi.isClosed()) {
+                        ketNoi.close();
+                    }
+                } catch (SQLException e) {
+                    Logger.getLogger(DoiMatKhauFrame.class.getName()).log(Level.SEVERE, null, e);
+                }
             }
         } else {
             JOptionPane.showMessageDialog(this, "Vui lòng điền đúng thông tin vào các trường.");
-        }
-    }//GEN-LAST:event_btndmkActionPerformed
+    }    }//GEN-LAST:event_btndmkActionPerformed
 
     /**
      * @param args the command line arguments

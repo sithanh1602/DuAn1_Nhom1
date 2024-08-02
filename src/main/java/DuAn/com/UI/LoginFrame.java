@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package DuAn.com.UI;
+import CheckForm.AutoPasswordEncryption;
 import DuAn.com.UI.staff.HomeFrameStaff;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
@@ -133,6 +134,7 @@ public class LoginFrame extends javax.swing.JFrame{
     }
     
 
+
     private void checkAccount() throws ClassNotFoundException, SQLException {
         String username = txtUser.getText();
         char[] passwordChars = txtPass.getPassword();
@@ -158,14 +160,48 @@ public class LoginFrame extends javax.swing.JFrame{
                     }
                     txtPass.setText(password); // Thiết lập lại trường mật khẩu với giá trị vừa nhập
                 } else {
-                    JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                    // Mật khẩu chưa được mã hóa, so sánh mật khẩu trực tiếp
+                    if (password.equals(storedPassword)) {
+                        handleSuccessfulLogin(chucvu);
+
+                        // Mã hóa mật khẩu và cập nhật vào cơ sở dữ liệu
+                        String hashedPassword = AutoPasswordEncryption.hashPassword(password);
+                        String updateQuery = "UPDATE NHAN_VIEN SET MAT_KHAU = ? WHERE ID_NV = ?";
+                        try (PreparedStatement updateStatement = ketNoi.prepareStatement(updateQuery)) {
+                            updateStatement.setString(1, hashedPassword);
+                            updateStatement.setString(2, username);
+                            updateStatement.executeUpdate();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                    }
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Tài khoản không tồn tại!");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Lỗi khi kiểm tra tài khoản: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
     }
-    
+}
+
+
+
+private void handleSuccessfulLogin(String chucvu) {
+    if (chucvu.equals("Quản lý")) {
+        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
+        this.dispose();
+        new HomeFrame().setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
+        this.dispose();
+        new HomeFrameStaff().setVisible(true);
+    }
+}
     public boolean checkVali() {
         if (txtUser.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải nhập tài khoản !");
@@ -188,6 +224,7 @@ public class LoginFrame extends javax.swing.JFrame{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        emailSender1 = new com.email.EmailSender();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
@@ -459,6 +496,7 @@ public class LoginFrame extends javax.swing.JFrame{
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDangNhap;
     private javax.swing.JCheckBox chkRemember;
+    private com.email.EmailSender emailSender1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
