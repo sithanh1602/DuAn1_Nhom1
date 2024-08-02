@@ -10,6 +10,13 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Color;
 import static java.awt.Color.red;
 import java.awt.Cursor;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -26,14 +33,70 @@ import javax.swing.JOptionPane;
 public class LoginFrame extends javax.swing.JFrame{
 
     Connection ketNoi;
+    
+    private static final String CREDENTIALS_FILE = "credentials.txt";
     /**
      * Creates new form LoginFrame
      */
     public LoginFrame() {
         initComponents();
         init();
+        
+        loadCredentials(); // Tự động điền thông tin đăng nhập nếu đã lưu trước đó
+    }
+    
+    // Phương thức băm mật khẩu
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
+    // Lưu thông tin đăng nhập vào file
+    private void saveCredentials(String username, String password) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(CREDENTIALS_FILE))) {
+            writer.write(username + "\n" + password); // Lưu mật khẩu gốc thay vì mã băm
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Tải thông tin đăng nhập từ file
+    private void loadCredentials() {
+        File file = new File(CREDENTIALS_FILE);
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String username = reader.readLine();
+                String password = reader.readLine(); // Đọc mật khẩu gốc từ file
+                txtUser.setText(username);
+                txtPass.setText(password); // Hiển thị lại mật khẩu gốc
+
+                chkRemember.setSelected(true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    // Xóa thông tin đăng nhập đã lưu
+    private void clearCredentials() {
+        File file = new File(CREDENTIALS_FILE);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    
     void init() {
         setLocationRelativeTo(null);
         lblOr.setCursor(new Cursor(Cursor.HAND_CURSOR) {
@@ -71,24 +134,31 @@ public class LoginFrame extends javax.swing.JFrame{
     }
     
 
-private void checkAccount() {
-    String username = txtUser.getText();
-    char[] passwordChars = txtPass.getPassword();
-    String password = new String(passwordChars);
 
-    try {
+    private void checkAccount() throws ClassNotFoundException, SQLException {
+        String username = txtUser.getText();
+        char[] passwordChars = txtPass.getPassword();
+        String password = new String(passwordChars); // Lưu trữ mật khẩu vào biến tạm thời
         ketNoiCsdl();
-        String sql = "SELECT CHUC_VU, MAT_KHAU FROM NHAN_VIEN WHERE ID_NV = ?";
-        try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                String storedPassword = resultSet.getString("MAT_KHAU");
-                String chucvu = resultSet.getString("CHUC_VU");
-
-                if (AutoPasswordEncryption.checkPassword(password, storedPassword)) {
-                    // Nếu mật khẩu đã mã hóa và hợp lệ
-                    handleSuccessfulLogin(chucvu);
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            String sql = "SELECT CHUC_VU FROM NHAN_VIEN WHERE ID_NV = ? AND MAT_KHAU = ?";
+            try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
+                statement.setString(1, username);
+                statement.setString(2, password);
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    String chucvu = resultSet.getString("CHUC_VU");
+                    if (chucvu.equals("Quản lý")) {
+                        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
+                        this.dispose();
+                        new HomeFrame().setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
+                        this.dispose();
+                        new HomeFrameStaff().setVisible(true);
+                    }
+                    txtPass.setText(password); // Thiết lập lại trường mật khẩu với giá trị vừa nhập
                 } else {
                     // Mật khẩu chưa được mã hóa, so sánh mật khẩu trực tiếp
                     if (password.equals(storedPassword)) {
@@ -214,6 +284,11 @@ private void handleSuccessfulLogin(String chucvu) {
         jPanel2.add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 199, 239, 28));
 
         chkRemember.setText("Remember password ?");
+        chkRemember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkRememberActionPerformed(evt);
+            }
+        });
         jPanel2.add(chkRemember, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 233, -1, -1));
 
         btnDangNhap.setText("Đăng nhập");
@@ -332,9 +407,36 @@ private void handleSuccessfulLogin(String chucvu) {
 
     private void btnDangNhapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDangNhapActionPerformed
         // TODO add your handling code here:
+//        if (checkVali()) {
+//            try {
+//                checkAccount();
+//            } catch (ClassNotFoundException ex) {
+//                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (SQLException ex) {
+//                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        };
+
         if (checkVali()) {
+        try {
+            String username = txtUser.getText();
+            char[] passwordChars = txtPass.getPassword();
+            String password = new String(passwordChars);
+
             checkAccount();
-        };
+
+            // Nếu đăng nhập thành công và người dùng chọn "Remember password"
+            if (chkRemember.isSelected()) {
+                saveCredentials(username, password);
+            } else {
+                clearCredentials();
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     }//GEN-LAST:event_btnDangNhapActionPerformed
 
     private void lblForgotMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblForgotMouseClicked
@@ -350,6 +452,10 @@ private void handleSuccessfulLogin(String chucvu) {
     private void lblForgotMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblForgotMouseExited
         lblForgot.setForeground(Color.BLACK);
     }//GEN-LAST:event_lblForgotMouseExited
+
+    private void chkRememberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRememberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkRememberActionPerformed
 
     /**
      * @param args the command line arguments
