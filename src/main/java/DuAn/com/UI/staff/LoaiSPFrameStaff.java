@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package DuAn.com.UI;
+package DuAn.com.UI.staff;
 
+import DuAn.com.UI.*;
 import CheckForm.AddID_Auto;
 import java.awt.Cursor;
 import java.sql.Connection;
@@ -21,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author NITRO 5
  */
-public class LoaiSPFrame extends javax.swing.JFrame {
+public class LoaiSPFrameStaff extends javax.swing.JFrame {
     ImageIcon icon;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
@@ -33,7 +34,7 @@ public class LoaiSPFrame extends javax.swing.JFrame {
     /**
      * Creates new form LoaiSPFrame
      */
-    public LoaiSPFrame() throws ClassNotFoundException, SQLException {
+    public LoaiSPFrameStaff() throws ClassNotFoundException, SQLException {
         initComponents();
         init();
         AddID_Auto addID_Auto = new AddID_Auto();
@@ -363,11 +364,11 @@ public class LoaiSPFrame extends javax.swing.JFrame {
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
         try {
-            new SanPhamForm().setVisible(true);
+            new SanPhamFormStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_lblThoatMouseClicked
 
@@ -391,9 +392,9 @@ public class LoaiSPFrame extends javax.swing.JFrame {
 
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnThemActionPerformed
 
@@ -409,9 +410,9 @@ public class LoaiSPFrame extends javax.swing.JFrame {
             TaiDulieuVaoBang();
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnSuaActionPerformed
 
@@ -442,9 +443,9 @@ public class LoaiSPFrame extends javax.swing.JFrame {
             tblLSP.setModel(model);
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_txtSearchKeyReleased
 
@@ -464,9 +465,9 @@ public class LoaiSPFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Xoá thành công!");
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnXoaActionPerformed
 
@@ -491,14 +492,20 @@ public class LoaiSPFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LoaiSPFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LoaiSPFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LoaiSPFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LoaiSPFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -506,11 +513,11 @@ public class LoaiSPFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new LoaiSPFrame().setVisible(true);
+                    new LoaiSPFrameStaff().setVisible(true);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
-                    Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

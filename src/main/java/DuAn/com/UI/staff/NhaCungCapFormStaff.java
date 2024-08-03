@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package DuAn.com.UI;
+package DuAn.com.UI.staff;
 
+import DuAn.com.UI.*;
 import CheckForm.AddID_Auto;
 import java.awt.Cursor;
 import java.sql.Connection;
@@ -23,7 +24,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author NITRO 5
  */
-public class NhaCungCapForm extends javax.swing.JFrame {
+public class NhaCungCapFormStaff extends javax.swing.JFrame {
     ImageIcon icon;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
@@ -36,7 +37,7 @@ public class NhaCungCapForm extends javax.swing.JFrame {
     /**
      * Creates new form NhaCungCapForm
      */
-    public NhaCungCapForm() throws ClassNotFoundException, SQLException {
+    public NhaCungCapFormStaff() throws ClassNotFoundException, SQLException {
         initComponents();
         init();
         AddID_Auto addID_Auto = new AddID_Auto();
@@ -510,15 +511,15 @@ public class NhaCungCapForm extends javax.swing.JFrame {
             }
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrameStaff().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void tblDataNccMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDataNccMouseClicked
@@ -588,9 +589,9 @@ public class NhaCungCapForm extends javax.swing.JFrame {
             checkStmt.close();
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
 
 
@@ -670,9 +671,9 @@ public class NhaCungCapForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(NhaCungCapForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(NhaCungCapForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_btnSuaActionPerformed
@@ -694,25 +695,28 @@ public class NhaCungCapForm extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NhaCungCapForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NhaCungCapForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NhaCungCapForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NhaCungCapForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new NhaCungCapForm().setVisible(true);
+                    new NhaCungCapFormStaff().setVisible(true);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(NhaCungCapForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
-                    Logger.getLogger(NhaCungCapForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NhaCungCapFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

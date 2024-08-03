@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -31,7 +32,11 @@ import javax.swing.table.DefaultTableModel;
  * @author NITRO 5 dsd xccxxcsdf
  */
 public class NhanVienForm extends javax.swing.JFrame {
-
+    ImageIcon icon;
+    public void doiIcon() {
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
+        setIconImage(icon.getImage());
+    }
     String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY3;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
     public NhanVienForm() {

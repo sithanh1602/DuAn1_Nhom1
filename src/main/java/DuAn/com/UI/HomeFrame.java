@@ -8,12 +8,17 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -32,6 +37,7 @@ public class HomeFrame extends javax.swing.JFrame {
         init();
         doiIcon();
     }
+    
     
     void init(){
         btnLightTheme.addActionListener(new ActionListener() {
@@ -104,7 +110,7 @@ public class HomeFrame extends javax.swing.JFrame {
     }
     
     public void doiIcon() {
-        icon = new ImageIcon("src/main/resources/images/Sell.PNG");
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
     }
     
@@ -267,7 +273,7 @@ public class HomeFrame extends javax.swing.JFrame {
         });
 
         btnDonHang.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Price Tag USD.png"))); // NOI18N
-        btnDonHang.setText("Hoá đơn");
+        btnDonHang.setText("Tạo hoá đơn");
         btnDonHang.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDonHang.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDonHang.addActionListener(new java.awt.event.ActionListener() {
@@ -277,7 +283,7 @@ public class HomeFrame extends javax.swing.JFrame {
         });
 
         btnDHCT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/More Details.png"))); // NOI18N
-        btnDHCT.setText("Tạo hoá đơn");
+        btnDHCT.setText("Hoá đơn");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDHCT.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDHCT.addActionListener(new java.awt.event.ActionListener() {
@@ -349,6 +355,11 @@ public class HomeFrame extends javax.swing.JFrame {
         );
 
         btnDarkTheme.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Moon.png"))); // NOI18N
+        btnDarkTheme.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDarkThemeActionPerformed(evt);
+            }
+        });
 
         btnLightTheme.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Sun.png"))); // NOI18N
 
@@ -373,14 +384,14 @@ public class HomeFrame extends javax.swing.JFrame {
                                 .addComponent(lblOr))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(btnDarkTheme)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnLightTheme)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(btnDarkTheme)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnLightTheme)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -513,6 +524,10 @@ public class HomeFrame extends javax.swing.JFrame {
         dispose();
         new DoiMatKhauFrame().setVisible(true);
     }//GEN-LAST:event_btnDoiMatKhauActionPerformed
+
+    private void btnDarkThemeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDarkThemeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDarkThemeActionPerformed
 
     /**
      * @param args the command line arguments

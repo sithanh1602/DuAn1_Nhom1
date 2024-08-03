@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,7 +25,11 @@ import javax.swing.JOptionPane;
  *
  */
 public class LoginFrame extends javax.swing.JFrame{
-
+    ImageIcon icon;
+    public void doiIcon() {
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
+        setIconImage(icon.getImage());
+    }
     Connection ketNoi;
     /**
      * Creates new form LoginFrame
@@ -125,7 +130,7 @@ private void handleSuccessfulLogin(String chucvu) {
     if (chucvu.equals("Quản lý")) {
         JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
         this.dispose();
-        new HomeFrame().setVisible(true);
+         new HomeFrame().setVisible(true);
     } else {
         JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
         this.dispose();

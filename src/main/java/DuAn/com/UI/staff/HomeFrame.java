@@ -9,6 +9,10 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,18 +26,20 @@ import javax.swing.UIManager;
 
 /**
  *
- * @author NITRO 5
+ * @author NITRO 5aaaaaaa
  */
-public class HomeFrameStaff extends javax.swing.JFrame {
+public class HomeFrame extends javax.swing.JFrame {
     ImageIcon icon;
     /**
      * Creates new form FormEduSys
-     */
-    public HomeFrameStaff() {
+     */ 
+    public HomeFrame() {
         initComponents();
         init();
         doiIcon();
     }
+    
+    
     void init(){
         btnLightTheme.addActionListener(new ActionListener() {
             @Override
@@ -69,7 +75,11 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         });
         btnNcc.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
+        btnNhanVien.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
         btnSanPham.setCursor(new Cursor(Cursor.HAND_CURSOR) {
+        });
+        btnThongKe.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
         new Timer(1000,  new ActionListener() {
             SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss a");
@@ -78,11 +88,6 @@ public class HomeFrameStaff extends javax.swing.JFrame {
              lblWatch.setText(format.format(new Date()));
             }
         }).start();
-    }
-    
-    public void doiIcon() {
-        icon = new ImageIcon("src/main/resources/images/Technology.png");
-        setIconImage(icon.getImage());
     }
     
     private void switchToLightTheme() {
@@ -103,6 +108,11 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    public void doiIcon() {
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
+        setIconImage(icon.getImage());
     }
     
 
@@ -133,8 +143,11 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         btnNcc = new javax.swing.JButton();
         btnDonHang = new javax.swing.JButton();
         btnDHCT = new javax.swing.JButton();
-        btnLightTheme = new javax.swing.JButton();
+        btnNhanVien = new javax.swing.JButton();
+        btnThongKe = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
         btnDarkTheme = new javax.swing.JButton();
+        btnLightTheme = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -172,6 +185,7 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         jToolBar2.setRollover(true);
 
         btnDangXuat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/out.png"))); // NOI18N
+        btnDangXuat.setText("Đăng xuất");
         btnDangXuat.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDangXuat.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDangXuat.addActionListener(new java.awt.event.ActionListener() {
@@ -182,9 +196,15 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         jToolBar2.add(btnDangXuat);
 
         btnDoiMatKhau.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Change.png"))); // NOI18N
+        btnDoiMatKhau.setText("Đổi mật khẩu");
         btnDoiMatKhau.setFocusable(false);
         btnDoiMatKhau.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDoiMatKhau.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDoiMatKhau.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnDoiMatKhauMouseClicked(evt);
+            }
+        });
         btnDoiMatKhau.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDoiMatKhauActionPerformed(evt);
@@ -193,6 +213,7 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         jToolBar2.add(btnDoiMatKhau);
 
         btnHuongDan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Earth Planet.png"))); // NOI18N
+        btnHuongDan.setText("Hướng dẫn");
         btnHuongDan.setFocusable(false);
         btnHuongDan.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnHuongDan.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -220,7 +241,7 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         });
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Sell.png"))); // NOI18N
-        jLabel2.setText("Staff");
+        jLabel2.setText("Quản lý");
 
         btnSanPham.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/product.png"))); // NOI18N
         btnSanPham.setText("Sản phẩm");
@@ -253,7 +274,7 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         });
 
         btnDonHang.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Price Tag USD.png"))); // NOI18N
-        btnDonHang.setText("Tạo hoá đơn");
+        btnDonHang.setText("Hoá đơn");
         btnDonHang.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDonHang.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDonHang.addActionListener(new java.awt.event.ActionListener() {
@@ -263,12 +284,32 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         });
 
         btnDHCT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/More Details.png"))); // NOI18N
-        btnDHCT.setText("Hoá đơn");
+        btnDHCT.setText("Tạo hoá đơn");
         btnDHCT.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDHCT.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDHCT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDHCTActionPerformed(evt);
+            }
+        });
+
+        btnNhanVien.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Staff.png"))); // NOI18N
+        btnNhanVien.setText("Nhân viên");
+        btnNhanVien.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnNhanVien.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnNhanVien.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNhanVienActionPerformed(evt);
+            }
+        });
+
+        btnThongKe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Combo Chart.png"))); // NOI18N
+        btnThongKe.setText("Thống kê");
+        btnThongKe.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnThongKe.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnThongKe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThongKeActionPerformed(evt);
             }
         });
 
@@ -287,13 +328,25 @@ public class HomeFrameStaff extends javax.swing.JFrame {
                 .addComponent(btnDonHang)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDHCT)
-                .addGap(0, 154, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnNhanVien)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnThongKe)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 793, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnThongKe, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNhanVien, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDHCT, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDonHang, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnNcc, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -302,14 +355,9 @@ public class HomeFrameStaff extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        btnLightTheme.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Sun.png"))); // NOI18N
-
         btnDarkTheme.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Moon.png"))); // NOI18N
-        btnDarkTheme.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDarkThemeActionPerformed(evt);
-            }
-        });
+
+        btnLightTheme.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Sun.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -317,11 +365,11 @@ public class HomeFrameStaff extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -329,15 +377,17 @@ public class HomeFrameStaff extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblGreen)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblOr))))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(lblOr))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(btnDarkTheme)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnLightTheme)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnDarkTheme)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnLightTheme)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -351,7 +401,7 @@ public class HomeFrameStaff extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 309, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 278, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnLightTheme, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnDarkTheme, javax.swing.GroupLayout.Alignment.TRAILING))
@@ -386,9 +436,9 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         try {
             new KhachHangFormStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnKhachHangActionPerformed
 
@@ -397,20 +447,25 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         try {
             new SanPhamFormStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnSanPhamActionPerformed
+
+    private void btnNhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNhanVienActionPerformed
+        dispose();
+        new NhanVienForm().setVisible(true);
+    }//GEN-LAST:event_btnNhanVienActionPerformed
 
     private void btnDonHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDonHangActionPerformed
         dispose();
         try {
-            new TaoHoaDonFrameStaff().setVisible(true);
+            new HoaDonFrameStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnDonHangActionPerformed
 
@@ -435,31 +490,36 @@ public class HomeFrameStaff extends javax.swing.JFrame {
         try {
             new NhaCungCapFormStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnNccActionPerformed
 
     private void btnDHCTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDHCTActionPerformed
         dispose();
         try {
-            new HoaDonFrameStaff().setVisible(true);
+            new TaoHoaDonFrameStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(HomeFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HomeFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnDHCTActionPerformed
+
+    private void btnThongKeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThongKeActionPerformed
+        dispose();
+        new ThongKeFrame().setVisible(true);
+    }//GEN-LAST:event_btnThongKeActionPerformed
+
+    private void btnDoiMatKhauMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDoiMatKhauMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDoiMatKhauMouseClicked
 
     private void btnDoiMatKhauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoiMatKhauActionPerformed
         dispose();
         new DoiMatKhauFrameStaff().setVisible(true);
     }//GEN-LAST:event_btnDoiMatKhauActionPerformed
-
-    private void btnDarkThemeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDarkThemeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnDarkThemeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -478,19 +538,21 @@ public class HomeFrameStaff extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(HomeFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HomeFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(HomeFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HomeFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(HomeFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HomeFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(HomeFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HomeFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        FlatMacDarkLaf.setup();
+        //FlatIntelliJLaf.setup();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new HomeFrameStaff().setVisible(true);
+                new HomeFrame().setVisible(true);
             }
         });
     }
@@ -505,12 +567,15 @@ public class HomeFrameStaff extends javax.swing.JFrame {
     private javax.swing.JButton btnKhachHang;
     private javax.swing.JButton btnLightTheme;
     private javax.swing.JButton btnNcc;
+    private javax.swing.JButton btnNhanVien;
     private javax.swing.JButton btnSanPham;
+    private javax.swing.JButton btnThongKe;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JToolBar jToolBar2;
     private javax.swing.JLabel lblBlue;
     private javax.swing.JLabel lblGreen;
