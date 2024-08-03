@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author NITRO 5
  */
 public class CapNhapPassForgot extends javax.swing.JFrame {
-
+    ImageIcon icon;
     private String employeeID; // Store the employee ID
     Connection ketNoi;
 
@@ -28,6 +29,11 @@ public class CapNhapPassForgot extends javax.swing.JFrame {
         this.employeeID = employeeID;
         txtMaNV.setText(employeeID);
         init();
+    }
+    
+    public void doiIcon() {
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
+        setIconImage(icon.getImage());
     }
 
     public void ketNoiCsdl() throws ClassNotFoundException, SQLException {

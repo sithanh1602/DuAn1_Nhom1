@@ -6,6 +6,7 @@ package DuAn.com.UI;
 
 import DuAn.com.email.DatabaseHelper;
 import com.email.EmailSender;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -13,7 +14,11 @@ import javax.swing.JOptionPane;
  * @author NITRO 5
  */
 public class quenMK extends javax.swing.JFrame {
-
+    ImageIcon icon;
+    public void doiIcon() {
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
+        setIconImage(icon.getImage());
+    }
     private String verificationCode;
 
     /**

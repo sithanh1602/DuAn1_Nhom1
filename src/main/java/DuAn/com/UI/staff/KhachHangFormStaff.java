@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package DuAn.com.UI;
+package DuAn.com.UI.staff;
 
+import DuAn.com.UI.*;
 import CheckForm.AddID_Auto;
 import java.awt.Cursor;
 import java.sql.Connection;
@@ -23,7 +24,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author NITRO 5
  */
-public class KhachHangForm extends javax.swing.JFrame {
+public class KhachHangFormStaff extends javax.swing.JFrame {
     ImageIcon icon;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
@@ -36,7 +37,7 @@ public class KhachHangForm extends javax.swing.JFrame {
     /**
      * Creates new form KhachHangForm
      */
-    public KhachHangForm() throws ClassNotFoundException, SQLException {
+    public KhachHangFormStaff() throws ClassNotFoundException, SQLException {
         initComponents();
         init();
         AddID_Auto addID_Auto = new AddID_Auto();
@@ -542,7 +543,7 @@ public class KhachHangForm extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrameStaff().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void tblDataKHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDataKHMouseClicked
@@ -591,9 +592,9 @@ public class KhachHangForm extends javax.swing.JFrame {
                 ketNoi.close();
             }
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnThemActionPerformed
 
@@ -645,9 +646,9 @@ public class KhachHangForm extends javax.swing.JFrame {
             clearForm(); // Xóa các trường nhập liệu
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
 
 
@@ -704,9 +705,9 @@ public class KhachHangForm extends javax.swing.JFrame {
             clearForm(); // Xóa các trường nhập liệu
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_btnXoaActionPerformed
@@ -778,25 +779,28 @@ public class KhachHangForm extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(KhachHangForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(KhachHangFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(KhachHangForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(KhachHangFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(KhachHangForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(KhachHangFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(KhachHangForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(KhachHangFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new KhachHangForm().setVisible(true);
+                    new KhachHangFormStaff().setVisible(true);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
-                    Logger.getLogger(KhachHangForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

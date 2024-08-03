@@ -48,7 +48,7 @@ public class LoadingFrame extends javax.swing.JFrame {
         thoiGian.start();
     }
      public void doiIcon() {
-        icon = new ImageIcon("src/main/resources/images/software_256.png");
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
     }
     /**

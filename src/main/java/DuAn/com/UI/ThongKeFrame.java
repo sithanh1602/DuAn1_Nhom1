@@ -17,6 +17,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -35,7 +37,11 @@ import org.jfree.data.general.PieDataset;
  * @author NITRO 5
  */
 public class ThongKeFrame extends javax.swing.JFrame {
-
+    ImageIcon icon;
+    public void doiIcon() {
+        icon = new ImageIcon("src/main/resources/images/Technology.png");
+        setIconImage(icon.getImage());
+    }
     String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY3;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
     /**
@@ -52,6 +58,12 @@ public class ThongKeFrame extends javax.swing.JFrame {
         frame.add(pnlChartSoLuongBan);
         frame.add(pnlChartKho);
         frame.add(pnlChartDoanhSo);
+
+        pnlChartSoLuongBan.setBorder(BorderFactory.createTitledBorder("Số lượng bán"));
+        pnlChartKho.setBorder(BorderFactory.createTitledBorder("Kho"));
+        pnlChartDoanhSo.setBorder(BorderFactory.createTitledBorder("Doanh số"));
+
+        
 
         frame.pack();
         frame.setVisible(true);
@@ -109,57 +121,56 @@ public class ThongKeFrame extends javax.swing.JFrame {
         panel.setPreferredSize(new Dimension(300, 300)); // Set preferred size
         return panel;
     }
-     private PieDataset createDatasetKho() {
-    DefaultPieDataset dataset = new DefaultPieDataset();
 
-    String minDate = txtMinDate.getText();
-    String maxDate = txtMaxDate.getText();
-    String query = "SELECT ID_SP, TEN_SP, SUM(SL_TONKHO) AS SO_TON_KHO FROM SAN_PHAM A GROUP BY ID_SP, TEN_SP";
+    private PieDataset createDatasetKho() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
 
-    try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
-        try (ResultSet rs = pst.executeQuery()) {
-            while (rs.next()) {
-                String productName = rs.getString("TEN_SP");
-                int stockQuantity = rs.getInt("SO_TON_KHO");
-                dataset.setValue(productName, stockQuantity);
+        String minDate = txtMinDate.getText();
+        String maxDate = txtMaxDate.getText();
+        String query = "SELECT ID_SP, TEN_SP, SUM(SL_TONKHO) AS SO_TON_KHO FROM SAN_PHAM A GROUP BY ID_SP, TEN_SP";
+
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String productName = rs.getString("TEN_SP");
+                    int stockQuantity = rs.getInt("SO_TON_KHO");
+                    dataset.setValue(productName, stockQuantity);
+                }
             }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ tồn kho: " + ex.getMessage());
         }
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ tồn kho: " + ex.getMessage());
+
+        return dataset;
     }
 
-    return dataset;
-}
+    private PieDataset createDatasetDoanhSo() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
 
-private PieDataset createDatasetDoanhSo() {
-    DefaultPieDataset dataset = new DefaultPieDataset();
+        String minDate = txtMinDate.getText();
+        String maxDate = txtMaxDate.getText();
+        String query = "SELECT A.ID_NV, TEN_NV, SUM(TONG_TIEN) AS TONG_DOANHTHU "
+                + "FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV "
+                + "INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON "
+                + "WHERE NGAY_HOA_DON BETWEEN ? AND ? "
+                + "GROUP BY A.ID_NV, TEN_NV";
 
-    String minDate = txtMinDate.getText();
-    String maxDate = txtMaxDate.getText();
-    String query = "SELECT A.ID_NV, TEN_NV, SUM(TONG_TIEN) AS TONG_DOANHTHU " +
-                   "FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV " +
-                   "INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON " +
-                   "WHERE NGAY_HOA_DON BETWEEN ? AND ? " +
-                   "GROUP BY A.ID_NV, TEN_NV";
-
-    try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setString(1, minDate);
-        pst.setString(2, maxDate);
-        try (ResultSet rs = pst.executeQuery()) {
-            while (rs.next()) {
-                String employeeName = rs.getString("TEN_NV");
-                double totalRevenue = rs.getDouble("TONG_DOANHTHU");
-                dataset.setValue(employeeName, totalRevenue);
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+            pst.setString(1, minDate);
+            pst.setString(2, maxDate);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    String employeeName = rs.getString("TEN_NV");
+                    double totalRevenue = rs.getDouble("TONG_DOANHTHU");
+                    dataset.setValue(employeeName, totalRevenue);
+                }
             }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ doanh thu: " + ex.getMessage());
         }
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(this, "Lỗi khi lấy dữ liệu biểu đồ doanh thu: " + ex.getMessage());
+
+        return dataset;
     }
-
-    return dataset;
-}
-
-
 
     private PieDataset createDatasetSoLuongBan() {
         DefaultPieDataset dataset = new DefaultPieDataset();
@@ -167,10 +178,10 @@ private PieDataset createDatasetDoanhSo() {
         String minDate = txtMinDate.getText();
         String maxDate = txtMaxDate.getText();
         String query = "SELECT A.ID_HOA_DON, SUM(A.SO_LUONG) AS SL_BAN, B.NGAY_HOA_DON, B.TONG_TIEN, TEN_SP  FROM CHI_TIET_HOA_DON A INNER JOIN HOA_DON B ON A.ID_HOA_DON = B.ID_HOA_DON INNER JOIN SAN_PHAM C ON C.ID_SP = C.ID_SP WHERE B.NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_HOA_DON, B.NGAY_HOA_DON, B.TONG_TIEN, TEN_SP";
-        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
             pst.setString(1, minDate);
             pst.setString(2, maxDate);
-            try ( ResultSet rs = pst.executeQuery()) {
+            try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String productName = rs.getString("TEN_SP");
                     int soldQuantity = rs.getInt("SL_BAN");
@@ -212,10 +223,6 @@ private PieDataset createDatasetDoanhSo() {
         panel.validate();
     }
 
-  
-
-  
-
     private ChartPanel createChartPanel() {
         // Create a dataset
         CategoryDataset dataset = createDataset();
@@ -249,13 +256,13 @@ private PieDataset createDatasetDoanhSo() {
                 + "FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON "
                 + "WHERE NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_NV, TEN_NV";
 
-        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
 
             // Set the parameters for the query
             pst.setString(1, "2024-01-01"); // Example start date
             pst.setString(2, "2024-12-31"); // Example end date
 
-            try ( ResultSet rs = pst.executeQuery()) {
+            try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String employeeName = rs.getString("TEN_NV");
                     int totalProductsSold = rs.getInt("TONG_SP_BAN");
@@ -279,10 +286,10 @@ private PieDataset createDatasetDoanhSo() {
                 + "FROM CHI_TIET_HOA_DON A INNER JOIN HOA_DON B ON A.ID_HOA_DON = B.ID_HOA_DON "
                 + "WHERE B.NGAY_HOA_DON BETWEEN ? AND ? "
                 + "GROUP BY A.ID_HOA_DON, B.NGAY_HOA_DON, B.TONG_TIEN";
-        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
             pst.setString(1, minDate);
             pst.setString(2, maxDate);
-            try ( ResultSet rs = pst.executeQuery()) {
+            try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String ID = rs.getString("ID_HOA_DON");
                     String soLuongBan = rs.getString("SL_BAN");
@@ -303,10 +310,10 @@ private PieDataset createDatasetDoanhSo() {
         String minDate = txtMinDate.getText();
         String maxDate = txtMaxDate.getText();
         String query = "SELECT A.ID_NV, TEN_NV, COUNT(ID_SP) AS TONG_SP_BAN,SUM(SO_LUONG) AS TONG_SL_BAN, SUM(TONG_TIEN) AS TONG_DOANHTHU FROM NHAN_VIEN A INNER JOIN HOA_DON B ON A.ID_NV = B.ID_NV INNER JOIN CHI_TIET_HOA_DON C ON C.ID_HOA_DON = B.ID_HOA_DON WHERE NGAY_HOA_DON BETWEEN ? AND ? GROUP BY A.ID_NV, TEN_NV, TONG_TIEN";
-        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
             pst.setString(1, minDate);
             pst.setString(2, maxDate);
-            try ( ResultSet rs = pst.executeQuery()) {
+            try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String ID = rs.getString("ID_NV");
                     String soLuongBan = rs.getString("TEN_NV");
@@ -326,8 +333,8 @@ private PieDataset createDatasetDoanhSo() {
         DefaultTableModel model = (DefaultTableModel) tblKho_TK.getModel();
         model.setRowCount(0); // Clear all rows in the table before filling it with new data
         String query = "SELECT ID_SP, TEN_SP, SUM(SL_TONKHO) AS SO_TON_KHO FROM SAN_PHAM A GROUP BY ID_SP, TEN_SP";
-        try ( Connection con = DriverManager.getConnection(url);  PreparedStatement pst = con.prepareStatement(query)) {
-            try ( ResultSet rs = pst.executeQuery()) {
+        try (Connection con = DriverManager.getConnection(url); PreparedStatement pst = con.prepareStatement(query)) {
+            try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     String ID = rs.getString("ID_SP");
                     String name = rs.getString("TEN_SP");

@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package DuAn.com.UI;
+package DuAn.com.UI.staff;
 
+import DuAn.com.UI.*;
 import CheckForm.AddID_Auto;
 import CheckForm.CurrencyRenderer;
 import java.awt.Cursor;
@@ -27,7 +28,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * @author NITRO 5
  */
-public class HoaDonFrame extends javax.swing.JFrame {
+public class HoaDonFrameStaff extends javax.swing.JFrame {
     ImageIcon icon;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
@@ -37,7 +38,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
     DefaultTableModel model1 = new NonEditableTableModel();
     Connection ketNoi;
 
-    public HoaDonFrame() throws ClassNotFoundException, SQLException {
+    public HoaDonFrameStaff() throws ClassNotFoundException, SQLException {
         initComponents();
         init();
         AddID_Auto addID_Auto = new AddID_Auto();
@@ -57,7 +58,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
                     updateInvoiceStatus();// hàm cập nhập trạng thái
                 } catch (ClassNotFoundException | SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(HoaDonFrame.this, "Lỗi khi cập nhật trạng thái hóa đơn.");
+                    JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Lỗi khi cập nhật trạng thái hóa đơn.");
                 }
             }
         });
@@ -70,8 +71,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
                 // Kiểm tra nếu có chọn hóa đơn
                 if (selectedRow != -1) {
                     // Hiển thị hộp thoại xác nhận trước khi in
-                    int response = JOptionPane.showConfirmDialog(
-                            HoaDonFrame.this,
+                    int response = JOptionPane.showConfirmDialog(HoaDonFrameStaff.this,
                             "Bạn có muốn in hóa đơn không?",
                             "Xác nhận",
                             JOptionPane.YES_NO_OPTION
@@ -99,19 +99,19 @@ public class HoaDonFrame extends javax.swing.JFrame {
                         try {
                             String productDetails = laySanPhamDaMua(idHoaDon);
                             dispose();
-                            InHoaDon inHoaDon = new InHoaDon();
+                            InHoaDonStaff inHoaDon = new InHoaDonStaff();
                             inHoaDon.setInvoiceDetails(details, productDetails);
                             inHoaDon.setVisible(true);
                         } catch (ClassNotFoundException | SQLException ex) {
                             ex.printStackTrace();
-                            JOptionPane.showMessageDialog(HoaDonFrame.this, "Lỗi khi hiển thị hóa đơn.");
+                            JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Lỗi khi hiển thị hóa đơn.");
                         }
                     } else {
                         // Nếu người dùng chọn No, không làm gì cả
-                        JOptionPane.showMessageDialog(HoaDonFrame.this, "In hóa đơn bị hủy.");
+                        JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "In hóa đơn bị hủy.");
                     }
                 } else {
-                    JOptionPane.showMessageDialog(HoaDonFrame.this, "Vui lòng chọn hóa đơn để in.");
+                    JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Vui lòng chọn hóa đơn để in.");
                 }
             }
         });
@@ -144,13 +144,13 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
         // Kiểm tra nếu chưa chọn dòng trên bảng
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(HoaDonFrame.this, "Vui lòng chọn hóa đơn để cập nhật.");
+            JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Vui lòng chọn hóa đơn để cập nhật.");
             return; // Dừng thực thi nếu không chọn hóa đơn
         }
 
         // Kiểm tra nếu chưa chọn trạng thái
         if (!rdoChuaThanhToan.isSelected() && !rdoDaThanhToan.isSelected() && !rdoDaThanhToanGiaoHang.isSelected()) {
-            JOptionPane.showMessageDialog(HoaDonFrame.this, "Bạn cần chọn trạng thái cho hóa đơn.");
+            JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Bạn cần chọn trạng thái cho hóa đơn.");
             return; // Dừng thực thi nếu chưa chọn trạng thái
         }
 
@@ -177,10 +177,10 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
         // Thông báo kết quả cập nhật
         if (rowsUpdated > 0) {
-            JOptionPane.showMessageDialog(HoaDonFrame.this, "Cập nhật trạng thái hóa đơn thành công.");
+            JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Cập nhật trạng thái hóa đơn thành công.");
             TaiDulieuVaoBang(); // Refresh data
         } else {
-            JOptionPane.showMessageDialog(HoaDonFrame.this, "Không tìm thấy hóa đơn.");
+            JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Không tìm thấy hóa đơn.");
         }
 
         ketNoi.close();
@@ -256,7 +256,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
                         hienThiChiTietHoaDon(idHoaDon);
                     } catch (ClassNotFoundException | SQLException ex) {
                         ex.printStackTrace();
-                        JOptionPane.showMessageDialog(HoaDonFrame.this, "Lỗi khi hiển thị chi tiết hóa đơn.");
+                        JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Lỗi khi hiển thị chi tiết hóa đơn.");
                     }
                 }
             }
@@ -292,7 +292,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
                             hienThiSanPhamDaMua(idHoaDon); // Hiển thị tên sản phẩm đã mua và số lượng
                         } catch (ClassNotFoundException | SQLException ex) {
                             ex.printStackTrace();
-                            JOptionPane.showMessageDialog(HoaDonFrame.this, "Lỗi khi hiển thị chi tiết hóa đơn.");
+                            JOptionPane.showMessageDialog(HoaDonFrameStaff.this, "Lỗi khi hiển thị chi tiết hóa đơn.");
                         }
                     }
                 }
@@ -780,7 +780,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -807,7 +807,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrameStaff().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     /**
@@ -827,25 +827,28 @@ public class HoaDonFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(HoaDonFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HoaDonFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(HoaDonFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HoaDonFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(HoaDonFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HoaDonFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(HoaDonFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HoaDonFrameStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new HoaDonFrame().setVisible(true);
+                    new HoaDonFrameStaff().setVisible(true);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(HoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(HoaDonFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
-                    Logger.getLogger(HoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(HoaDonFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package DuAn.com.UI;
+package DuAn.com.UI.staff;
 
+import DuAn.com.UI.*;
 import CheckForm.AddID_Auto;
 import CheckForm.CurrencyFormatter;
 import CheckForm.ImageRenderer;
@@ -37,7 +38,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author NITRO 5
  */
-public class SanPhamForm extends javax.swing.JFrame {
+public class SanPhamFormStaff extends javax.swing.JFrame {
     ImageIcon icon;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
@@ -52,7 +53,7 @@ public class SanPhamForm extends javax.swing.JFrame {
     /**
      * Creates new form SanPhamForm
      */
-    public SanPhamForm() throws ClassNotFoundException, SQLException {
+    public SanPhamFormStaff() throws ClassNotFoundException, SQLException {
         initComponents();
         CurrencyFormatter currencyFormatter = new CurrencyFormatter(this);
         init();
@@ -140,9 +141,9 @@ public class SanPhamForm extends javax.swing.JFrame {
             cboLoaiSP.setModel(model_box);
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -160,9 +161,9 @@ public class SanPhamForm extends javax.swing.JFrame {
             cboNhaCC.setModel(model_box1);
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -241,9 +242,9 @@ public class SanPhamForm extends javax.swing.JFrame {
                     }
                     ketNoi.close();
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
-                    Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -349,7 +350,7 @@ public class SanPhamForm extends javax.swing.JFrame {
             ketNoi.close();
 
         } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi xử lý cơ sở dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -938,17 +939,17 @@ public class SanPhamForm extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrameStaff().setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void btnThemLoaiSPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemLoaiSPActionPerformed
         try {
             dispose();
-            new LoaiSPFrame().setVisible(true);
+            new LoaiSPFrameStaff().setVisible(true);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnThemLoaiSPActionPerformed
 
@@ -976,9 +977,9 @@ public class SanPhamForm extends javax.swing.JFrame {
             }
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_cboNhaCCActionPerformed
 
@@ -1010,9 +1011,9 @@ public class SanPhamForm extends javax.swing.JFrame {
             }
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_cboLoaiSPActionPerformed
 
@@ -1036,9 +1037,9 @@ public class SanPhamForm extends javax.swing.JFrame {
             tblSp.setModel(model);
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_txtSearchKeyReleased
 
@@ -1094,10 +1095,10 @@ public class SanPhamForm extends javax.swing.JFrame {
                 ketNoi.close();
             }
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi khi thêm sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnThemActionPerformed
@@ -1154,10 +1155,10 @@ public class SanPhamForm extends javax.swing.JFrame {
             stmtCheckExistence.close();
             ketNoi.close();
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-            Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật sản phẩm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSuaActionPerformed
@@ -1183,9 +1184,9 @@ public class SanPhamForm extends javax.swing.JFrame {
 //            clear();
 //            ketNoi.close();
 //        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
 //        } catch (SQLException ex) {
-//            Logger.getLogger(LoaiSPFrame.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(LoaiSPFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
 //        }
         deleteProduct();
     }//GEN-LAST:event_btnXoaActionPerformed
@@ -1247,25 +1248,28 @@ public class SanPhamForm extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SanPhamForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SanPhamFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SanPhamForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SanPhamFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SanPhamForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SanPhamFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SanPhamForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SanPhamFormStaff.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new SanPhamForm().setVisible(true);
+                    new SanPhamFormStaff().setVisible(true);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
-                    Logger.getLogger(SanPhamForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SanPhamFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
