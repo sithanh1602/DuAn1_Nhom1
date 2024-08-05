@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package DuAn.com.UI;
+
 import CheckForm.AutoPasswordEncryption;
 import DuAn.com.UI.staff.HomeFrameStaff;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -24,13 +25,16 @@ import javax.swing.JOptionPane;
  *
  *
  */
-public class LoginFrame extends javax.swing.JFrame{
+public class LoginFrame extends javax.swing.JFrame {
+
     ImageIcon icon;
+
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
     }
     Connection ketNoi;
+
     /**
      * Creates new form LoginFrame
      */
@@ -61,82 +65,90 @@ public class LoginFrame extends javax.swing.JFrame{
         lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR) {
         });
     }
-    
+
     private void toggleShowPassword() {
         if (txtPass.getEchoChar() == '\u2022') {
             txtPass.setEchoChar((char) 0); // Hiển thị mật khẩu
         }
     }
-    
-     public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
+
+    public void ketNoiCsdl() throws ClassNotFoundException, SQLException {
         String url = "jdbc:sqlserver://localhost:1433; databaseName = DU_AN_1_GROUP1_DIENMAY3;encrypt=true;trustServerCertificate=true;";// them doan cuoi vao url
         String user = "sa";
         String pass = "123456";
         ketNoi = DriverManager.getConnection(url, user, pass);
     }
-    
 
-private void checkAccount() {
-    String username = txtUser.getText();
-    char[] passwordChars = txtPass.getPassword();
-    String password = new String(passwordChars);
+    private void checkAccount() {
+        String username = txtUser.getText();
+        char[] passwordChars = txtPass.getPassword();
+        String password = new String(passwordChars);
 
-    try {
-        ketNoiCsdl();
-        String sql = "SELECT CHUC_VU, MAT_KHAU FROM NHAN_VIEN WHERE ID_NV = ?";
-        try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                String storedPassword = resultSet.getString("MAT_KHAU");
-                String chucvu = resultSet.getString("CHUC_VU");
+        try {
+            ketNoiCsdl();
+            String sql = "SELECT CHUC_VU, MAT_KHAU, TEN_NV FROM NHAN_VIEN WHERE ID_NV = ?";
+            try (PreparedStatement statement = ketNoi.prepareStatement(sql)) {
+                statement.setString(1, username);
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    String storedPassword = resultSet.getString("MAT_KHAU");
+                    String chucvu = resultSet.getString("CHUC_VU");
+                    String fullName = resultSet.getString("TEN_NV");
 
-                if (AutoPasswordEncryption.checkPassword(password, storedPassword)) {
-                    // Nếu mật khẩu đã mã hóa và hợp lệ
-                    handleSuccessfulLogin(chucvu);
-                } else {
-                    // Mật khẩu chưa được mã hóa, so sánh mật khẩu trực tiếp
-                    if (password.equals(storedPassword)) {
-                        handleSuccessfulLogin(chucvu);
-
-                        // Mã hóa mật khẩu và cập nhật vào cơ sở dữ liệu
-                        String hashedPassword = AutoPasswordEncryption.hashPassword(password);
-                        String updateQuery = "UPDATE NHAN_VIEN SET MAT_KHAU = ? WHERE ID_NV = ?";
-                        try (PreparedStatement updateStatement = ketNoi.prepareStatement(updateQuery)) {
-                            updateStatement.setString(1, hashedPassword);
-                            updateStatement.setString(2, username);
-                            updateStatement.executeUpdate();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        }
+                    if (AutoPasswordEncryption.checkPassword(password, storedPassword)) {
+                        handleSuccessfulLogin(username, fullName, chucvu);
                     } else {
-                        JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                        if (password.equals(storedPassword)) {
+                            handleSuccessfulLogin(username, fullName, chucvu);
+
+                            String hashedPassword = AutoPasswordEncryption.hashPassword(password);
+                            String updateQuery = "UPDATE NHAN_VIEN SET MAT_KHAU = ? WHERE ID_NV = ?";
+                            try (PreparedStatement updateStatement = ketNoi.prepareStatement(updateQuery)) {
+                                updateStatement.setString(1, hashedPassword);
+                                updateStatement.setString(2, username);
+                                updateStatement.executeUpdate();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
+                        }
                     }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Tài khoản không tồn tại!");
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Tài khoản không tồn tại!");
             }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi kiểm tra tài khoản: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-    } catch (ClassNotFoundException | SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Lỗi khi kiểm tra tài khoản: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
     }
-}
 
-
-
-private void handleSuccessfulLogin(String chucvu) {
-    if (chucvu.equals("Quản lý")) {
-        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
-        this.dispose();
-         new HomeFrame().setVisible(true);
-    } else {
-        JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
-        this.dispose();
-        new HomeFrameStaff().setVisible(true);
+    private void handleSuccessfulLogin(String maNhanVien, String fullName, String chucvu) {
+        if (chucvu.equals("Quản lý")) {
+            JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
+            this.dispose();
+            new HomeFrame(maNhanVien, fullName, chucvu).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
+            this.dispose();
+            new HomeFrameStaff(maNhanVien, fullName, chucvu).setVisible(true);
+        }
     }
-}
+
+//    private void handleSuccessfulLogin(String chucvu) {
+//        if (chucvu.equals("Quản lý")) {
+//            JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Quản Lý!");
+//            this.dispose();
+//            new HomeFrame().setVisible(true);
+//        } else {
+//            JOptionPane.showMessageDialog(this, "Bạn đã đăng nhập với tư cách Nhân Viên!");
+//            this.dispose();
+//            //new HomeFrameStaff().setVisible(true);
+//        }
+//    }
+
     public boolean checkVali() {
         if (txtUser.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải nhập tài khoản !");
@@ -226,6 +238,7 @@ private void handleSuccessfulLogin(String chucvu) {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btnDangNhapMouseEntered(evt);
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 btnDangNhapMouseExited(evt);
             }
@@ -266,9 +279,11 @@ private void handleSuccessfulLogin(String chucvu) {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblForgotMouseClicked(evt);
             }
+
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 lblForgotMouseEntered(evt);
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 lblForgotMouseExited(evt);
             }
@@ -278,16 +293,16 @@ private void handleSuccessfulLogin(String chucvu) {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 394, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 394, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -312,9 +327,9 @@ private void handleSuccessfulLogin(String chucvu) {
     }//GEN-LAST:event_lblGreenMouseClicked
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
-        if(this.getExtendedState() != LoginFrame.MAXIMIZED_BOTH){
+        if (this.getExtendedState() != LoginFrame.MAXIMIZED_BOTH) {
             this.setExtendedState(LoginFrame.MAXIMIZED_BOTH);
-        }else{
+        } else {
             this.setExtendedState(LoginFrame.NORMAL);
         }
     }//GEN-LAST:event_lblBlueMouseClicked
@@ -323,8 +338,8 @@ private void handleSuccessfulLogin(String chucvu) {
         jLabel6.setVisible(true);
         jLabel5.setVisible(false);
         if (evt.getClickCount() == 1) { // Nhấp đúp chuột
-                    toggleShowPassword();
-                }
+            toggleShowPassword();
+        }
     }//GEN-LAST:event_jLabel5MouseClicked
 
     private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked

@@ -38,6 +38,9 @@ import org.jfree.data.general.PieDataset;
  */
 public class ThongKeFrame extends javax.swing.JFrame {
     ImageIcon icon;
+    private String maNhanVien;
+    private String fullName;
+    private String chucVu;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
@@ -47,9 +50,12 @@ public class ThongKeFrame extends javax.swing.JFrame {
     /**
      * Creates new form ThongKeFrame
      */
-    public ThongKeFrame() {
+    public ThongKeFrame(String maNV, String fullName, String chucVu) {
         initComponents();
         init();
+        this.maNhanVien = maNV;
+        this.fullName = fullName;
+        this.chucVu = chucVu;
         JFrame frame = new JFrame("Pie Charts Example");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new GridLayout(1, 3));
@@ -683,8 +689,8 @@ public class ThongKeFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
-        dispose();
-        new HomeFrame().setVisible(true);
+         dispose();
+        new HomeFrame(maNhanVien, fullName, chucVu).setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void lblBlueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBlueMouseClicked
@@ -733,7 +739,7 @@ public class ThongKeFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ThongKeFrame().setVisible(true);
+                new ThongKeFrame("Mã nhân viên", "Họ và Tên","Chức vụ").setVisible(true);
             }
         });
     }
