@@ -11,10 +11,13 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Color;
 import static java.awt.Color.red;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -47,6 +50,27 @@ public class LoginFrame extends javax.swing.JFrame {
         initComponents();
         init();
         loadCredentials();
+         btnDangNhap.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleLogin();
+            }
+        });
+    }
+    
+     private void handleLogin() {
+        String username = txtUser.getText();
+        String password = new String(txtPass.getPassword());
+
+        // Perform your authentication logic here...
+        boolean isAuthenticated = true; // Replace with actual authentication logic
+
+        if (isAuthenticated) {
+            saveCredentials(username, password);
+            // Proceed to the next frame or application logic
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid username or password.");
+        }
     }
 
     void init() {
@@ -175,14 +199,21 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     private void saveCredentials(String username, String password) {
-        Properties properties = new Properties();
-        properties.setProperty("username", username);
-        properties.setProperty("password", password);
-
-        try (FileOutputStream fos = new FileOutputStream("src/main/resources/user.properties")) {
-            properties.store(fos, null);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (chkRemember.isSelected()) {
+            Properties props = new Properties();
+            props.setProperty("username", username);
+            props.setProperty("password", password);
+            try (OutputStream out = new FileOutputStream("src/main/resources/user.properties")) {
+                props.store(out, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Delete the credentials file if "Remember Me" is not selected
+            File file = new File("src/main/resources/user.properties");
+            if (file.exists()) {
+                file.delete();
+            }
         }
     }
 

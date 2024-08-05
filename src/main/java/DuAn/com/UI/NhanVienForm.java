@@ -74,26 +74,41 @@ public class NhanVienForm extends javax.swing.JFrame {
     }
 
     private void updateFieldsFromSelectedRow() {
-        if (tblStaff.getSelectedRow() != -1) {
-            int row = tblStaff.getSelectedRow();
-            txtID_NV.setText(tblStaff.getValueAt(row, 0).toString());
-            txtNameNV.setText(tblStaff.getValueAt(row, 1).toString());
-            String gender = tblStaff.getValueAt(row, 2).toString();
-            if ("Nam".equals(gender)) {
-                rdoMale.setSelected(true);
-            } else {
-                rdoFemale.setSelected(true);
-            }
-            txtDate.setText(tblStaff.getValueAt(row, 3).toString());
-            cbochucVu.setSelectedItem(tblStaff.getValueAt(row, 4).toString());
-            txtLuong_Money.setText(tblStaff.getValueAt(row, 5).toString());
-            txtEmail.setText(tblStaff.getValueAt(row, 7).toString());
-            // Hiển thị mật khẩu với dấu sao
-            String password = tblStaff.getValueAt(row, 6).toString(); 
-            txtMK_NV.setText("*".repeat(password.length()));
+    if (tblStaff.getSelectedRow() != -1) {
+        int row = tblStaff.getSelectedRow();
+
+        Object value = tblStaff.getValueAt(row, 0);
+        txtID_NV.setText(value != null ? value.toString() : "");
+
+        value = tblStaff.getValueAt(row, 1);
+        txtNameNV.setText(value != null ? value.toString() : "");
+
+        value = tblStaff.getValueAt(row, 2);
+        String gender = value != null ? value.toString() : "";
+        if ("Nam".equals(gender)) {
+            rdoMale.setSelected(true);
+        } else {
+            rdoFemale.setSelected(true);
         }
 
+        value = tblStaff.getValueAt(row, 3);
+        txtDate.setText(value != null ? value.toString() : "");
+
+        value = tblStaff.getValueAt(row, 4);
+        cbochucVu.setSelectedItem(value != null ? value.toString() : "");
+
+        value = tblStaff.getValueAt(row, 5);
+        txtLuong_Money.setText(value != null ? value.toString() : "");
+
+        value = tblStaff.getValueAt(row, 6);
+        String password = value != null ? value.toString() : "";
+        txtMK_NV.setText("*".repeat(password.length()));
+
+        value = tblStaff.getValueAt(row, 7);
+        txtEmail.setText(value != null ? value.toString() : "");
     }
+}
+
 
     private void loadCombobox() {
         // Tạo JComboBox
