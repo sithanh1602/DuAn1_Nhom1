@@ -33,15 +33,21 @@ import javax.swing.table.DefaultTableModel;
  */
 public class NhanVienForm extends javax.swing.JFrame {
     ImageIcon icon;
+    private String maNhanVien;
+    private String fullName;
+    private String chucVu;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
     }
     String url = "jdbc:sqlserver://localhost:1433;database=DU_AN_1_GROUP1_DIENMAY3;integratedSecurity=false;user=sa;password=123456;encrypt=true;trustServerCertificate=true;";
 
-    public NhanVienForm() {
+    public NhanVienForm(String maNV, String fullName, String chucVu) {
         initComponents();
         init();
+        this.maNhanVien = maNV;
+        this.fullName = fullName;
+        this.chucVu = chucVu;
         AddID_Auto addID_Auto = new AddID_Auto();
         addID_Auto.initTextFieldMap(this); // Khởi tạo các JTextField từ lớp NhanVienForm
         addID_Auto.setTextFieldValues(); // Đặt giá trị và tạo mã tự động nếu có
@@ -747,7 +753,7 @@ public class NhanVienForm extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrame(maNhanVien, fullName, chucVu).setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void txtDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDateActionPerformed
@@ -1002,7 +1008,7 @@ public class NhanVienForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new NhanVienForm().setVisible(true);
+                new NhanVienForm("Mã nhân viên", "Họ và Tên","Chức vụ").setVisible(true);
             }
         });
     }

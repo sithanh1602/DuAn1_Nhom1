@@ -308,13 +308,6 @@ public class InHoaDon extends javax.swing.JFrame {
 
     private void lblOrMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOrMouseClicked
         dispose();
-        try {
-            new HoaDonFrame().setVisible(true);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(InHoaDon.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(InHoaDon.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }//GEN-LAST:event_lblOrMouseClicked
 
     /**

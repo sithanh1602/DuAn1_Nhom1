@@ -26,6 +26,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class KhachHangFormStaff extends javax.swing.JFrame {
     ImageIcon icon;
+    private String maNhanVien;
+    private String fullName;
+    private String chucVu;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
@@ -37,9 +40,12 @@ public class KhachHangFormStaff extends javax.swing.JFrame {
     /**
      * Creates new form KhachHangForm
      */
-    public KhachHangFormStaff() throws ClassNotFoundException, SQLException {
+    public KhachHangFormStaff(String maNV, String fullName, String chucVu) throws ClassNotFoundException, SQLException {
         initComponents();
         init();
+        this.maNhanVien = maNV;
+        this.fullName = fullName;
+        this.chucVu = chucVu;
         AddID_Auto addID_Auto = new AddID_Auto();
         addID_Auto.initTextFieldMap(this); // Khởi tạo các JTextField từ lớp NhanVienForm
         addID_Auto.setTextFieldValues(); // Đặt giá trị và tạo mã tự động nếu có
@@ -543,7 +549,7 @@ public class KhachHangFormStaff extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrameStaff().setVisible(true);
+        new HomeFrameStaff(maNhanVien, fullName, chucVu).setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void tblDataKHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDataKHMouseClicked
@@ -789,14 +795,12 @@ public class KhachHangFormStaff extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new KhachHangFormStaff().setVisible(true);
+                    new KhachHangFormStaff("Mã nhân viên", "Họ và Tên","Chức vụ").setVisible(true);
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(KhachHangFormStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {

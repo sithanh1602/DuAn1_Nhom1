@@ -30,6 +30,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class HoaDonFrameStaff extends javax.swing.JFrame {
     ImageIcon icon;
+    private String maNhanVien;
+    private String fullName;
+    private String chucVu;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
@@ -38,9 +41,12 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
     DefaultTableModel model1 = new NonEditableTableModel();
     Connection ketNoi;
 
-    public HoaDonFrameStaff() throws ClassNotFoundException, SQLException {
+    public HoaDonFrameStaff(String maNV, String fullName, String chucVu) throws ClassNotFoundException, SQLException {
         initComponents();
         init();
+        this.maNhanVien = maNV;
+        this.fullName = fullName;
+        this.chucVu = chucVu;
         AddID_Auto addID_Auto = new AddID_Auto();
         addID_Auto.initTextFieldMap(this); // Khởi tạo các JTextField từ lớp NhanVienForm
         addID_Auto.setTextFieldValues();
@@ -98,8 +104,7 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
 
                         try {
                             String productDetails = laySanPhamDaMua(idHoaDon);
-                            dispose();
-                            InHoaDonStaff inHoaDon = new InHoaDonStaff();
+                            InHoaDon inHoaDon = new InHoaDon();
                             inHoaDon.setInvoiceDetails(details, productDetails);
                             inHoaDon.setVisible(true);
                         } catch (ClassNotFoundException | SQLException ex) {
@@ -593,6 +598,11 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
         jScrollPane3.setViewportView(txtSpDaMua);
 
         btnInHoaDon.setText("In hoá đơn");
+        btnInHoaDon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInHoaDonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -807,8 +817,12 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrameStaff().setVisible(true);
+        new HomeFrameStaff(maNhanVien,fullName, chucVu).setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
+
+    private void btnInHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInHoaDonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnInHoaDonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -837,14 +851,12 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new HoaDonFrameStaff().setVisible(true);
+                    new HoaDonFrameStaff("Mã nhân viên", "Họ và Tên","Chức vụ").setVisible(true);
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(HoaDonFrameStaff.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {

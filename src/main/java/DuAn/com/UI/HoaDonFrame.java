@@ -29,6 +29,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class HoaDonFrame extends javax.swing.JFrame {
     ImageIcon icon;
+    private String maNhanVien;
+    private String fullName;
+    private String chucVu;
     public void doiIcon() {
         icon = new ImageIcon("src/main/resources/images/Technology.png");
         setIconImage(icon.getImage());
@@ -37,9 +40,12 @@ public class HoaDonFrame extends javax.swing.JFrame {
     DefaultTableModel model1 = new NonEditableTableModel();
     Connection ketNoi;
 
-    public HoaDonFrame() throws ClassNotFoundException, SQLException {
+    public HoaDonFrame(String maNV, String fullName, String chucVu) throws ClassNotFoundException, SQLException {
         initComponents();
         init();
+        this.maNhanVien = maNV;
+        this.fullName = fullName;
+        this.chucVu = chucVu;
         AddID_Auto addID_Auto = new AddID_Auto();
         addID_Auto.initTextFieldMap(this); // Khởi tạo các JTextField từ lớp NhanVienForm
         addID_Auto.setTextFieldValues();
@@ -98,7 +104,6 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
                         try {
                             String productDetails = laySanPhamDaMua(idHoaDon);
-                            dispose();
                             InHoaDon inHoaDon = new InHoaDon();
                             inHoaDon.setInvoiceDetails(details, productDetails);
                             inHoaDon.setVisible(true);
@@ -593,6 +598,11 @@ public class HoaDonFrame extends javax.swing.JFrame {
         jScrollPane3.setViewportView(txtSpDaMua);
 
         btnInHoaDon.setText("In hoá đơn");
+        btnInHoaDon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInHoaDonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -807,8 +817,12 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrame(maNhanVien,fullName, chucVu).setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
+
+    private void btnInHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInHoaDonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnInHoaDonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -841,7 +855,7 @@ public class HoaDonFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new HoaDonFrame().setVisible(true);
+                    new HoaDonFrame("Mã nhân viên", "Họ và Tên","Chức vụ").setVisible(true);
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(HoaDonFrame.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {

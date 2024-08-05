@@ -260,7 +260,7 @@ public class FormHDCT extends javax.swing.JFrame {
 
     private void lblThoatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblThoatMouseClicked
         dispose();
-        new HomeFrame().setVisible(true);
+        new HomeFrame("Mã nhân viên", "Họ và Tên", "Chức vụ").setVisible(true);
     }//GEN-LAST:event_lblThoatMouseClicked
 
     private void lblGreenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblGreenMouseClicked
