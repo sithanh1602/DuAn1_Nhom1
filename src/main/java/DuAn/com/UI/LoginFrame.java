@@ -11,11 +11,19 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import java.awt.Color;
 import static java.awt.Color.red;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -41,6 +49,28 @@ public class LoginFrame extends javax.swing.JFrame {
     public LoginFrame() {
         initComponents();
         init();
+        loadCredentials();
+         btnDangNhap.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleLogin();
+            }
+        });
+    }
+    
+     private void handleLogin() {
+        String username = txtUser.getText();
+        String password = new String(txtPass.getPassword());
+
+        // Perform your authentication logic here...
+        boolean isAuthenticated = true; // Replace with actual authentication logic
+
+        if (isAuthenticated) {
+            saveCredentials(username, password);
+            // Proceed to the next frame or application logic
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid username or password.");
+        }
     }
 
     void init() {
@@ -97,6 +127,9 @@ public class LoginFrame extends javax.swing.JFrame {
 
                     if (AutoPasswordEncryption.checkPassword(password, storedPassword)) {
                         handleSuccessfulLogin(username, fullName, chucvu);
+                        if (chkRemember.isSelected()) {
+                            saveCredentials(username, password);
+                        }
                     } else {
                         if (password.equals(storedPassword)) {
                             handleSuccessfulLogin(username, fullName, chucvu);
@@ -110,6 +143,10 @@ public class LoginFrame extends javax.swing.JFrame {
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+
+                            if (chkRemember.isSelected()) {
+                                saveCredentials(username, password);
                             }
                         } else {
                             JOptionPane.showMessageDialog(this, "Tài khoản và mật khẩu không hợp lệ!");
@@ -148,7 +185,6 @@ public class LoginFrame extends javax.swing.JFrame {
 //            //new HomeFrameStaff().setVisible(true);
 //        }
 //    }
-
     public boolean checkVali() {
         if (txtUser.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải nhập tài khoản !");
@@ -160,6 +196,62 @@ public class LoginFrame extends javax.swing.JFrame {
         }
         return true;
 
+    }
+
+    private void saveCredentials(String username, String password) {
+        if (chkRemember.isSelected()) {
+            Properties props = new Properties();
+            props.setProperty("username", username);
+            props.setProperty("password", password);
+            try (OutputStream out = new FileOutputStream("src/main/resources/user.properties")) {
+                props.store(out, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Delete the credentials file if "Remember Me" is not selected
+            File file = new File("src/main/resources/user.properties");
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    private void loadCredentials() {
+        Properties properties = new Properties();
+        File file = new File("src/main/resources/user.properties");
+
+        // Check if the file exists, if not, create it
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs(); // Create directories if they don't exist
+                file.createNewFile(); // Create the file
+                // Initialize the file with empty username and password
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    properties.setProperty("username", "");
+                    properties.setProperty("password", "");
+                    properties.store(fos, null);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Load the properties from the file
+        try (FileInputStream fis = new FileInputStream(file)) {
+            properties.load(fis);
+            String username = properties.getProperty("username");
+            String password = properties.getProperty("password");
+            if (username != null && !username.isEmpty()) {
+                txtUser.setText(username);
+            }
+            if (password != null && !password.isEmpty()) {
+                txtPass.setText(password);
+                chkRemember.setSelected(true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
