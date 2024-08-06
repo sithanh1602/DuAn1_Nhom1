@@ -74,13 +74,13 @@ public class SanPhamForm extends javax.swing.JFrame {
         tblSp.getColumn("Images").setCellRenderer(new ImageRenderer());
 
         // Thiết lập kích thước cột
-        setColumnWidth(tblSp.getColumn("Images"), 400); // Cập nhật kích thước cột hình ảnh
+        setColumnWidth(tblSp.getColumn("Images"), 800); // Cập nhật kích thước cột hình ảnh
         setColumnWidth(tblSp.getColumn("Mã sãn phẩm"), 70);
         setColumnWidth(tblSp.getColumn("Tên sản phẩm"), 160);
-        setColumnWidth(tblSp.getColumn("Mã loại sản phẩm"), 70);
-        setColumnWidth(tblSp.getColumn("Mã nhà cung cấp"), 70);
-        setColumnWidth(tblSp.getColumn("Giá tiền"), 70);
-        setColumnWidth(tblSp.getColumn("Số lượng tồn kho"), 70);
+        setColumnWidth(tblSp.getColumn("Mã loại sản phẩm"), 100);
+        setColumnWidth(tblSp.getColumn("Mã nhà cung cấp"), 100);
+        setColumnWidth(tblSp.getColumn("Giá tiền"), 100);
+        setColumnWidth(tblSp.getColumn("Số lượng tồn kho"), 100);
 
         // Thiết lập kích thước hàng và font chữ
         tblSp.setRowHeight(100); // Thay đổi chiều cao của hàng
