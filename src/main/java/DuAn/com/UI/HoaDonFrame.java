@@ -165,11 +165,11 @@ public class HoaDonFrame extends javax.swing.JFrame {
 
         // Xác định trạng thái dựa trên radio button được chọn
         if (rdoChuaThanhToan.isSelected()) {
-            trangThai = "Chưa thanh toán";
+            trangThai = "Đã giao hàng";
         } else if (rdoDaThanhToan.isSelected()) {
-            trangThai = "Đã thanh toán";
+            trangThai = "Đã thanh toán, chưa giao hàng";
         } else if (rdoDaThanhToanGiaoHang.isSelected()) {
-            trangThai = "Đã thanh toán, đang giao hàng";
+            trangThai = "Hoàn tất giao dịch";
         }
 
         // Cập nhật trạng thái hóa đơn trong cơ sở dữ liệu

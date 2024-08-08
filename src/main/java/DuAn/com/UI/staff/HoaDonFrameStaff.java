@@ -524,13 +524,13 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
         btnCapNhap.setText("Cập nhập ");
 
         buttonGroup1.add(rdoChuaThanhToan);
-        rdoChuaThanhToan.setText("Chưa thanh toán");
+        rdoChuaThanhToan.setText("Đã giao hàng");
 
         buttonGroup1.add(rdoDaThanhToan);
-        rdoDaThanhToan.setText("Đã thanh toán");
+        rdoDaThanhToan.setText("Đã thanh toán, chưa giao hàng");
 
         buttonGroup1.add(rdoDaThanhToanGiaoHang);
-        rdoDaThanhToanGiaoHang.setText("Đã thanh toán, đang giao hàng");
+        rdoDaThanhToanGiaoHang.setText("Hoàn tất giao dịch");
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin hoá đơn", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
 
@@ -640,7 +640,7 @@ public class HoaDonFrameStaff extends javax.swing.JFrame {
                                         .addComponent(label8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(89, 89, 89)
